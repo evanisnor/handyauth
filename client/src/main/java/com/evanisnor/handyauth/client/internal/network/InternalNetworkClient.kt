@@ -1,12 +1,13 @@
-package com.evanisnor.handyauth.client.internal
+package com.evanisnor.handyauth.client.internal.network
 
 import com.evanisnor.handyauth.client.HandyAuthConfig
-import com.evanisnor.handyauth.client.internal.secure.CodeGenerator
 import com.evanisnor.handyauth.client.internal.model.*
+import com.evanisnor.handyauth.client.internal.secure.CodeGenerator
 import com.squareup.moshi.Moshi
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 
 class InternalNetworkClient(
@@ -18,6 +19,12 @@ class InternalNetworkClient(
             level = HttpLoggingInterceptor.Level.BODY
         })
         .build(),
+    private val exchangeResponseJsonAdapter: ExchangeResponseJsonAdapter = ExchangeResponseJsonAdapter(
+        moshi
+    ),
+    private val refreshResponseJsonAdapter: RefreshResponseJsonAdapter = RefreshResponseJsonAdapter(
+        moshi
+    )
 ) {
 
     fun createCodeVerifier(): String {
@@ -50,9 +57,9 @@ class InternalNetworkClient(
             )
             .build()
 
-        return client.newCall(exchangeRequest).send().response?.body?.let { body ->
+        return send(exchangeRequest)?.body?.let { body ->
             runCatching {
-                ExchangeResponseJsonAdapter(moshi).fromJson(body.source())
+                exchangeResponseJsonAdapter.fromJson(body.source())
             }.getOrNull()
         }
     }
@@ -69,11 +76,13 @@ class InternalNetworkClient(
             )
             .build()
 
-        return client.newCall(refreshRequest).send().response?.body?.let { body ->
+        return send(refreshRequest)?.body?.let { body ->
             runCatching {
-                RefreshResponseJsonAdapter(moshi).fromJson(body.source())
+                refreshResponseJsonAdapter.fromJson(body.source())
             }.getOrNull()
         }
     }
+
+    private suspend fun send(request: Request): Response? = client.newCall(request).send().response
 
 }

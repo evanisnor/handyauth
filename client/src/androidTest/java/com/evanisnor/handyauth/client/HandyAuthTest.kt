@@ -8,15 +8,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.evanisnor.handyauth.client.fakeserver.FakeAuthorizationServer
 import com.evanisnor.handyauth.client.fakeserver.FakeExchangeResponse
 import com.evanisnor.handyauth.client.fakeserver.FakeRefreshResponse
-import com.evanisnor.handyauth.client.internal.AuthStateRepository
-import com.evanisnor.handyauth.client.internal.AuthStateRepository.Companion.STATE_PREFS_NAME
+import com.evanisnor.handyauth.client.internal.state.AuthStateRepository
+import com.evanisnor.handyauth.client.internal.state.AuthStateRepository.Companion.STATE_PREFS_NAME
 import com.evanisnor.handyauth.client.internal.InternalHandyAuth
 import com.evanisnor.handyauth.client.util.TestAuthorizationValidator
 import com.evanisnor.handyauth.client.util.TestInstantFactory
 import com.evanisnor.handyauth.client.util.TestLoginActivity
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import org.junit.After
@@ -79,11 +78,10 @@ class HandyAuthTest {
         )
         setupSuccessfulAuthorization(server, config)
 
-        testAuthorization(handyAuth)
+        performAuthorization(handyAuth)
 
         server.waitForThisManyRequests(2)
         runBlocking {
-            delay(200)
             assertThat(handyAuth.isAuthorized).isTrue()
         }
     }
@@ -98,7 +96,7 @@ class HandyAuthTest {
         )
         setupFailedAuthorization(server)
 
-        testAuthorization(handyAuth)
+        performAuthorization(handyAuth)
 
         server.waitForThisManyRequests(1)
         assertThat(handyAuth.isAuthorized).isFalse()
@@ -117,7 +115,7 @@ class HandyAuthTest {
         setupSuccessfulAuthorization(server, config)
         authorizationValidator.isValid = false
 
-        testAuthorization(handyAuth)
+        performAuthorization(handyAuth)
 
         server.waitForThisManyRequests(1)
         runBlocking {
@@ -137,11 +135,10 @@ class HandyAuthTest {
         )
         setupSuccessfulAuthorization(server, config)
 
-        testAuthorization(handyAuth)
+        performAuthorization(handyAuth)
 
         server.waitForThisManyRequests(2)
         runBlocking {
-            delay(200)
             assertThat(handyAuth.accessToken(context)).isEqualTo(
                 HandyAccessToken(
                     token = "exchange-response-access-token",
@@ -155,22 +152,20 @@ class HandyAuthTest {
     @Test
     fun afterTokenRefresh_WhenTokenIsNotExpired_CurrentAccessTokenIsAvailable() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        val testInstantFactory = TestInstantFactory()
         val server = FakeAuthorizationServer()
         val config = createFakeConfig(server)
         val handyAuth: HandyAuth = InternalHandyAuth(
             config = config,
             scope = CoroutineScope(TestCoroutineDispatcher()),
             authStateRepository = AuthStateRepository(
-                instantFactory = testInstantFactory
+                instantFactory = TestInstantFactory()
             ),
-            instantFactory = testInstantFactory,
             authorizationValidator = TestAuthorizationValidator()
         )
         setupSuccessfulAuthorization(server, config)
         setupFreshAccessToken(server)
 
-        testAuthorization(handyAuth)
+        performAuthorization(handyAuth)
 
         server.waitForThisManyRequests(2)
 
@@ -197,21 +192,19 @@ class HandyAuthTest {
             authStateRepository = AuthStateRepository(
                 instantFactory = testInstantFactory
             ),
-            instantFactory = testInstantFactory,
             authorizationValidator = TestAuthorizationValidator()
         )
         setupSuccessfulAuthorization(server, config)
         setupFreshAccessToken(server)
         // Exchange-response token expiry
 
-        testAuthorization(handyAuth)
+        performAuthorization(handyAuth)
 
         server.waitForThisManyRequests(2)
 
         // Current time to compare to exchange-response token expiry - After, expired
         testInstantFactory.now = Instant.ofEpochMilli(2000L)
         runBlocking {
-            delay(200)
             assertThat(handyAuth.accessToken(context)).isEqualTo(
                 HandyAccessToken(
                     token = "refresh-response-access-token",
@@ -233,7 +226,7 @@ class HandyAuthTest {
         )
         setupSuccessfulAuthorization(server, config)
 
-        testAuthorization(handyAuth)
+        performAuthorization(handyAuth)
 
         server.waitForThisManyRequests(2)
         runBlocking {
@@ -256,20 +249,17 @@ class HandyAuthTest {
         )
         setupSuccessfulAuthorization(server, config)
 
-        testAuthorization(handyAuth)
+        performAuthorization(handyAuth)
 
         server.waitForThisManyRequests(2)
         runBlocking {
             handyAuth.logout(context)
 
-            delay(200)
-
             InternalHandyAuth(
                 config = config
             ).apply {
-                accessToken(context)
-                assertThat(isAuthorized).isFalse()
                 assertThat(accessToken(context)).isEqualTo(HandyAccessToken())
+                assertThat(isAuthorized).isFalse()
             }
         }
     }
@@ -286,12 +276,11 @@ class HandyAuthTest {
             authStateRepository = AuthStateRepository(
                 instantFactory = testInstantFactory
             ),
-            instantFactory = testInstantFactory,
             authorizationValidator = TestAuthorizationValidator()
         )
         setupSuccessfulAuthorization(server, config)
 
-        testAuthorization(handyAuth)
+        performAuthorization(handyAuth)
 
         server.waitForThisManyRequests(2)
 
@@ -326,12 +315,11 @@ class HandyAuthTest {
             authStateRepository = AuthStateRepository(
                 instantFactory = testInstantFactory
             ),
-            instantFactory = testInstantFactory,
             authorizationValidator = TestAuthorizationValidator()
         )
         setupSuccessfulAuthorization(server, config)
 
-        testAuthorization(handyAuth)
+        performAuthorization(handyAuth)
 
         server.waitForThisManyRequests(2)
 
@@ -415,7 +403,7 @@ class HandyAuthTest {
         server.acceptRefreshRequest(response = createRefreshResponse())
     }
 
-    private fun testAuthorization(handyAuth: HandyAuth) {
+    private fun performAuthorization(handyAuth: HandyAuth) {
         launchActivity<TestLoginActivity>()
             .moveToState(Lifecycle.State.CREATED)
             .onActivity { activity ->

@@ -1,4 +1,4 @@
-package com.evanisnor.handyauth.client.internal
+package com.evanisnor.handyauth.client.internal.network
 
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
