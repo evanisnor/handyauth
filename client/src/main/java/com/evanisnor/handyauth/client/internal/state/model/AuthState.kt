@@ -1,5 +1,6 @@
 package com.evanisnor.handyauth.client.internal.state.model
 
+import com.evanisnor.handyauth.client.HandyAccessToken
 import com.evanisnor.handyauth.client.internal.state.EpochMilli
 import com.squareup.moshi.JsonClass
 import java.time.Instant
@@ -13,8 +14,15 @@ data class AuthState(
     val accessTokenType: String? = null
 ) {
 
-    fun asMutableAuthState() = MutableAuthState(
+    fun isExpired(now: Instant) = tokenExpiry != null && now.isAfter(tokenExpiry)
+
+    fun asMutableAuthState(): MutableAuthState = MutableAuthState(
         isAuthorized, refreshToken, tokenExpiry, accessToken, accessTokenType
+    )
+
+    fun asAccessToken(): HandyAccessToken = HandyAccessToken(
+        token = accessToken ?: "",
+        tokenType = accessTokenType ?: ""
     )
 
 }

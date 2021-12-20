@@ -43,9 +43,6 @@ internal class InternalHandyAuth(
 
     override suspend fun accessToken(): HandyAccessToken =
         withContext(scope.coroutineContext) {
-
-            authStateRepository.restore()
-
             if (authStateRepository.isTokenExpired()) {
                 internalNetworkClient.refresh(authStateRepository.refreshToken)
                     ?.also { refreshResponse ->

@@ -10,16 +10,6 @@ data class MutableAuthState(
     var accessTokenType: String? = null
 ) {
 
-    fun isExpired(now: Instant) = tokenExpiry != null && now.isAfter(tokenExpiry)
-
-    fun clear() {
-        isAuthorized = false
-        refreshToken = null
-        tokenExpiry = null
-        accessToken = null
-        accessTokenType = null
-    }
-
     fun asAuthState() = AuthState(
         isAuthorized, refreshToken, tokenExpiry, accessToken, accessTokenType
     )
