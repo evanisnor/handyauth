@@ -3,7 +3,6 @@ package com.evanisnor.handyauth.client.internal.network
 import com.evanisnor.handyauth.client.HandyAuthConfig
 import com.evanisnor.handyauth.client.internal.model.*
 import com.evanisnor.handyauth.client.internal.secure.CodeGenerator
-import com.squareup.moshi.Moshi
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request

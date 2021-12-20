@@ -7,7 +7,6 @@ import com.evanisnor.handyauth.client.internal.model.AuthRequest
 import com.evanisnor.handyauth.client.internal.model.AuthResponse
 import com.evanisnor.handyauth.client.internal.network.InternalNetworkClient
 import com.evanisnor.handyauth.client.internal.secure.AuthorizationValidator
-import com.evanisnor.handyauth.client.internal.secure.DefaultAuthorizationValidator
 import com.evanisnor.handyauth.client.internal.state.AuthStateRepository
 import com.evanisnor.handyauth.client.ui.HandyAuthActivity
 import kotlinx.coroutines.*

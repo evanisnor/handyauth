@@ -15,7 +15,9 @@ import com.evanisnor.handyauth.client.internal.secure.AuthorizationValidator
 import com.evanisnor.handyauth.client.internal.secure.CodeGenerator
 import com.evanisnor.handyauth.client.internal.secure.DefaultSecureModule
 import com.evanisnor.handyauth.client.internal.secure.SecureModule
-import com.evanisnor.handyauth.client.internal.state.*
+import com.evanisnor.handyauth.client.internal.state.AuthStateCache
+import com.evanisnor.handyauth.client.internal.state.DefaultStateModule
+import com.evanisnor.handyauth.client.internal.state.StateModule
 import com.evanisnor.handyauth.client.internal.state.model.AuthStateJsonAdapter
 import com.evanisnor.handyauth.client.internal.time.InstantFactory
 import com.evanisnor.handyauth.client.util.TestAuthorizationValidator
@@ -24,12 +26,10 @@ import com.evanisnor.handyauth.client.util.TestLoginActivity
 import com.google.common.truth.Truth.assertThat
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.time.Instant
-import kotlin.time.ExperimentalTime
 
 @RunWith(AndroidJUnit4::class)
 class HandyAuthTest {
