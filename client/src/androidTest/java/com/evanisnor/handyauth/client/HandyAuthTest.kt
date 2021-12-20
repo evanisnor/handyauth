@@ -1,5 +1,6 @@
 package com.evanisnor.handyauth.client
 
+import android.app.Application
 import android.content.Context
 import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ApplicationProvider
@@ -8,17 +9,23 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.evanisnor.handyauth.client.fakeserver.FakeAuthorizationServer
 import com.evanisnor.handyauth.client.fakeserver.FakeExchangeResponse
 import com.evanisnor.handyauth.client.fakeserver.FakeRefreshResponse
-import com.evanisnor.handyauth.client.internal.state.AuthStateRepository
-import com.evanisnor.handyauth.client.internal.state.AuthStateRepository.Companion.STATE_PREFS_NAME
+import com.evanisnor.handyauth.client.internal.HandyAuthComponent
 import com.evanisnor.handyauth.client.internal.InternalHandyAuth
+import com.evanisnor.handyauth.client.internal.secure.AuthorizationValidator
+import com.evanisnor.handyauth.client.internal.secure.CodeGenerator
+import com.evanisnor.handyauth.client.internal.secure.DefaultSecureModule
+import com.evanisnor.handyauth.client.internal.secure.SecureModule
+import com.evanisnor.handyauth.client.internal.state.*
+import com.evanisnor.handyauth.client.internal.state.model.AuthStateJsonAdapter
+import com.evanisnor.handyauth.client.internal.time.InstantFactory
 import com.evanisnor.handyauth.client.util.TestAuthorizationValidator
 import com.evanisnor.handyauth.client.util.TestInstantFactory
 import com.evanisnor.handyauth.client.util.TestLoginActivity
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.CoroutineScope
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineDispatcher
 import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.time.Instant
@@ -27,119 +34,163 @@ import kotlin.time.ExperimentalTime
 @RunWith(AndroidJUnit4::class)
 class HandyAuthTest {
 
-    @After
-    fun cleanupState() {
-        ApplicationProvider.getApplicationContext<Context>().apply {
-            getSharedPreferences(STATE_PREFS_NAME, Context.MODE_PRIVATE).edit().apply {
-                clear()
-                apply()
-            }
-        }
+    lateinit var context: Context
+//    lateinit var persistentCache: AuthStateCache
+//    lateinit var handyAuth: HandyAuth
+
+    internal class TestStateModule(
+        private val defaultStateModule: DefaultStateModule = DefaultStateModule(),
+        private val testInstantFactory: TestInstantFactory?
+    ) : StateModule {
+
+        override fun instantFactory(): InstantFactory =
+            testInstantFactory ?: defaultStateModule.instantFactory()
+
+        override fun moshi(): Moshi = defaultStateModule.moshi()
+
+        override fun memoryCache(
+            persistentCache: AuthStateCache
+        ): AuthStateCache =
+            defaultStateModule.memoryCache(persistentCache)
+
+        override fun persistentCache(
+            context: Context,
+            config: HandyAuthConfig,
+            authStateJsonAdapter: AuthStateJsonAdapter
+        ): AuthStateCache =
+            defaultStateModule.persistentCache(context, config, authStateJsonAdapter)
+
+        override fun authStateJsonAdapter(
+            moshi: Moshi
+        ): AuthStateJsonAdapter =
+            defaultStateModule.authStateJsonAdapter(moshi)
+    }
+
+    internal class TestSecureModule(
+        private val defaultSecureModule: DefaultSecureModule = DefaultSecureModule(),
+        private val testAuthorizationValidator: TestAuthorizationValidator?
+    ) : SecureModule {
+
+
+        override fun authorizationValidator(): AuthorizationValidator =
+            testAuthorizationValidator ?: defaultSecureModule.authorizationValidator()
+
+        override fun codeGenerator(): CodeGenerator = defaultSecureModule.codeGenerator()
+    }
+
+    private fun createTestHandyAuthComponent(
+        config: HandyAuthConfig = createFakeConfig(),
+        testInstantFactory: TestInstantFactory? = null,
+        testAuthorizationValidator: TestAuthorizationValidator? = null
+    ): HandyAuthComponent {
+        val application = ApplicationProvider.getApplicationContext() as Application
+        return HandyAuthComponent.Builder()
+            .stateModule(
+                TestStateModule(
+                    testInstantFactory = testInstantFactory
+                )
+            )
+            .secureModule(
+                TestSecureModule(
+                    testAuthorizationValidator = testAuthorizationValidator
+                )
+            )
+            .build(application, config)
+    }
+
+    @Before
+    fun setup() {
+        context = ApplicationProvider.getApplicationContext()
     }
 
     @Test
     fun handyAuthInterfaceCreate_ReturnsInternalHandyAuth() {
-        val config = createFakeConfig()
-        val handyAuth = HandyAuth.create(config)
-
-        assertThat(handyAuth).isInstanceOf(InternalHandyAuth::class.java)
+        createTestHandyAuthComponent().use { component ->
+            assertThat(component.handyAuth).isInstanceOf(InternalHandyAuth::class.java)
+        }
     }
 
     @Test
     fun beforeAuthorization_UserIsNotAuthorized() {
-        val config = createFakeConfig()
-        val handyAuth: HandyAuth = InternalHandyAuth(config)
-
-        assertThat(handyAuth.isAuthorized).isFalse()
-    }
-
-    @Test
-    fun beforeAuthorization_AccessTokenIsBlank() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        val config = createFakeConfig()
-        val handyAuth: HandyAuth = InternalHandyAuth(
-            config = config,
-            scope = CoroutineScope(TestCoroutineDispatcher())
-        )
-
-        runBlocking {
-            assertThat(handyAuth.accessToken(context)).isEqualTo(HandyAccessToken())
-        }
-    }
-
-    @Test
-    fun afterAuthorizationSuccess_UserIsAuthorized() {
-        val server = FakeAuthorizationServer()
-        val config = createFakeConfig(server)
-        val handyAuth: HandyAuth = InternalHandyAuth(
-            config = config,
-            scope = CoroutineScope(TestCoroutineDispatcher()),
-            authorizationValidator = TestAuthorizationValidator()
-        )
-        setupSuccessfulAuthorization(server, config)
-
-        performAuthorization(handyAuth)
-
-        server.waitForThisManyRequests(2)
-        runBlocking {
-            assertThat(handyAuth.isAuthorized).isTrue()
-        }
-    }
-
-    @Test
-    fun afterAuthorizationError_UserIsNotAuthorized() {
-        val server = FakeAuthorizationServer()
-        val config = createFakeConfig(server)
-        val handyAuth: HandyAuth = InternalHandyAuth(
-            config = config,
-            scope = CoroutineScope(TestCoroutineDispatcher())
-        )
-        setupFailedAuthorization(server)
-
-        performAuthorization(handyAuth)
-
-        server.waitForThisManyRequests(1)
-        assertThat(handyAuth.isAuthorized).isFalse()
-    }
-
-    @Test
-    fun afterInvalidAuthorization_UserIsNotAuthorized() {
-        val authorizationValidator = TestAuthorizationValidator()
-        val server = FakeAuthorizationServer()
-        val config = createFakeConfig(server)
-        val handyAuth: HandyAuth = InternalHandyAuth(
-            config = config,
-            scope = CoroutineScope(TestCoroutineDispatcher()),
-            authorizationValidator = authorizationValidator
-        )
-        setupSuccessfulAuthorization(server, config)
-        authorizationValidator.isValid = false
-
-        performAuthorization(handyAuth)
-
-        server.waitForThisManyRequests(1)
-        runBlocking {
+        createTestHandyAuthComponent().use { component ->
+            val handyAuth = component.handyAuth
             assertThat(handyAuth.isAuthorized).isFalse()
         }
     }
 
     @Test
-    fun afterAuthorizationSuccess_AccessTokenIsAvailable() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
+    fun beforeAuthorization_AccessTokenIsBlank() = runBlocking {
+        createTestHandyAuthComponent().use { component ->
+            val handyAuth = component.handyAuth
+            assertThat(handyAuth.accessToken()).isEqualTo(HandyAccessToken())
+        }
+    }
+
+    @Test
+    fun afterAuthorizationSuccess_UserIsAuthorized() = runBlocking {
         val server = FakeAuthorizationServer()
         val config = createFakeConfig(server)
-        val handyAuth: HandyAuth = InternalHandyAuth(
+        createTestHandyAuthComponent(
             config = config,
-            scope = CoroutineScope(TestCoroutineDispatcher()),
-            authorizationValidator = TestAuthorizationValidator()
-        )
-        setupSuccessfulAuthorization(server, config)
+            testAuthorizationValidator = TestAuthorizationValidator()
+        ).use { component ->
+            val handyAuth: HandyAuth = component.handyAuth
+            setupSuccessfulAuthorization(server, config)
+            performAuthorization(handyAuth)
+            server.waitForThisManyRequests(2)
 
-        performAuthorization(handyAuth)
+            assertThat(handyAuth.isAuthorized).isTrue()
 
-        server.waitForThisManyRequests(2)
-        runBlocking {
-            assertThat(handyAuth.accessToken(context)).isEqualTo(
+        }
+    }
+
+    @Test
+    fun afterAuthorizationError_UserIsNotAuthorized() = runBlocking {
+        val server = FakeAuthorizationServer()
+        createTestHandyAuthComponent().use { component ->
+            val handyAuth = component.handyAuth
+            setupFailedAuthorization(server)
+            performAuthorization(handyAuth)
+
+            server.waitForThisManyRequests(1)
+            assertThat(handyAuth.isAuthorized).isFalse()
+        }
+    }
+
+    @Test
+    fun afterInvalidAuthorization_UserIsNotAuthorized() = runBlocking {
+        val authorizationValidator = TestAuthorizationValidator()
+        val server = FakeAuthorizationServer()
+        val config = createFakeConfig(server)
+        createTestHandyAuthComponent(
+            config = config,
+            testAuthorizationValidator = authorizationValidator
+        ).use { component ->
+            authorizationValidator.isValid = false
+
+            val handyAuth: HandyAuth = component.handyAuth
+            setupSuccessfulAuthorization(server, config)
+            performAuthorization(handyAuth)
+            server.waitForThisManyRequests(1)
+
+            assertThat(handyAuth.isAuthorized).isFalse()
+        }
+    }
+
+    @Test
+    fun afterAuthorizationSuccess_AccessTokenIsAvailable() = runBlocking {
+        val server = FakeAuthorizationServer()
+        val config = createFakeConfig(server)
+        createTestHandyAuthComponent(
+            config = config,
+            testAuthorizationValidator = TestAuthorizationValidator()
+        ).use { component ->
+            val handyAuth: HandyAuth = component.handyAuth
+            setupSuccessfulAuthorization(server, config)
+            performAuthorization(handyAuth)
+            server.waitForThisManyRequests(2)
+
+            assertThat(handyAuth.accessToken()).isEqualTo(
                 HandyAccessToken(
                     token = "exchange-response-access-token",
                     tokenType = "Fake"
@@ -148,29 +199,22 @@ class HandyAuthTest {
         }
     }
 
-    @ExperimentalTime
     @Test
-    fun afterTokenRefresh_WhenTokenIsNotExpired_CurrentAccessTokenIsAvailable() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
+    fun afterTokenRefresh_WhenTokenIsNotExpired_CurrentAccessTokenIsAvailable() = runBlocking {
         val server = FakeAuthorizationServer()
         val config = createFakeConfig(server)
-        val handyAuth: HandyAuth = InternalHandyAuth(
+        createTestHandyAuthComponent(
             config = config,
-            scope = CoroutineScope(TestCoroutineDispatcher()),
-            authStateRepository = AuthStateRepository(
-                instantFactory = TestInstantFactory()
-            ),
-            authorizationValidator = TestAuthorizationValidator()
-        )
-        setupSuccessfulAuthorization(server, config)
-        setupFreshAccessToken(server)
+            testInstantFactory = TestInstantFactory(),
+            testAuthorizationValidator = TestAuthorizationValidator()
+        ).use { component ->
+            val handyAuth = component.handyAuth
+            setupSuccessfulAuthorization(server, config)
+            setupFreshAccessToken(server)
+            performAuthorization(handyAuth)
+            server.waitForThisManyRequests(2)
 
-        performAuthorization(handyAuth)
-
-        server.waitForThisManyRequests(2)
-
-        runBlocking {
-            assertThat(handyAuth.accessToken(context)).isEqualTo(
+            assertThat(handyAuth.accessToken()).isEqualTo(
                 HandyAccessToken(
                     token = "exchange-response-access-token",
                     tokenType = "Fake"
@@ -179,33 +223,25 @@ class HandyAuthTest {
         }
     }
 
-    @ExperimentalTime
     @Test
-    fun afterTokenRefresh_WhenTokenIsExpired_FreshAccessTokenIsAvailable() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
+    fun afterTokenRefresh_WhenTokenIsExpired_FreshAccessTokenIsAvailable() = runBlocking {
         val testInstantFactory = TestInstantFactory()
         val server = FakeAuthorizationServer()
         val config = createFakeConfig(server)
-        val handyAuth: HandyAuth = InternalHandyAuth(
+        createTestHandyAuthComponent(
             config = config,
-            scope = CoroutineScope(TestCoroutineDispatcher()),
-            authStateRepository = AuthStateRepository(
-                instantFactory = testInstantFactory
-            ),
-            authorizationValidator = TestAuthorizationValidator()
-        )
-        setupSuccessfulAuthorization(server, config)
-        setupFreshAccessToken(server)
-        // Exchange-response token expiry
+            testInstantFactory = testInstantFactory,
+            testAuthorizationValidator = TestAuthorizationValidator()
+        ).use { component ->
+            val handyAuth = component.handyAuth
+            setupSuccessfulAuthorization(server, config)
+            setupFreshAccessToken(server)
+            performAuthorization(handyAuth)
+            server.waitForThisManyRequests(2)
+            // Current time to compare to exchange-response token expiry - After, expired
+            testInstantFactory.now = Instant.ofEpochMilli(2000L)
 
-        performAuthorization(handyAuth)
-
-        server.waitForThisManyRequests(2)
-
-        // Current time to compare to exchange-response token expiry - After, expired
-        testInstantFactory.now = Instant.ofEpochMilli(2000L)
-        runBlocking {
-            assertThat(handyAuth.accessToken(context)).isEqualTo(
+            assertThat(handyAuth.accessToken()).isEqualTo(
                 HandyAccessToken(
                     token = "refresh-response-access-token",
                     tokenType = "Fake"
@@ -215,133 +251,113 @@ class HandyAuthTest {
     }
 
     @Test
-    fun afterLogout_WhereInstanceIsSame_UserIsNotAuthenticated() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
+    fun afterLogout_WhereInstanceIsSame_UserIsNotAuthenticated() = runBlocking {
         val server = FakeAuthorizationServer()
         val config = createFakeConfig(server)
-        val handyAuth: HandyAuth = InternalHandyAuth(
+        createTestHandyAuthComponent(
             config = config,
-            scope = CoroutineScope(TestCoroutineDispatcher()),
-            authorizationValidator = TestAuthorizationValidator()
-        )
-        setupSuccessfulAuthorization(server, config)
-
-        performAuthorization(handyAuth)
-
-        server.waitForThisManyRequests(2)
-        runBlocking {
-            handyAuth.logout(context)
+            testAuthorizationValidator = TestAuthorizationValidator()
+        ).use { component ->
+            val handyAuth = component.handyAuth
+            setupSuccessfulAuthorization(server, config)
+            performAuthorization(handyAuth)
+            server.waitForThisManyRequests(2)
+            handyAuth.logout()
 
             assertThat(handyAuth.isAuthorized).isFalse()
-            assertThat(handyAuth.accessToken(context)).isEqualTo(HandyAccessToken())
+            assertThat(handyAuth.accessToken()).isEqualTo(HandyAccessToken())
         }
     }
 
     @Test
-    fun afterLogout_WhereInstanceIsNew_UserIsNotAuthenticated() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
+    fun afterLogout_WhereInstanceIsNew_UserIsNotAuthenticated(): Unit = runBlocking {
         val server = FakeAuthorizationServer()
         val config = createFakeConfig(server)
-        val handyAuth: HandyAuth = InternalHandyAuth(
+        createTestHandyAuthComponent(
             config = config,
-            scope = CoroutineScope(TestCoroutineDispatcher()),
-            authorizationValidator = TestAuthorizationValidator()
-        )
-        setupSuccessfulAuthorization(server, config)
+            testAuthorizationValidator = TestAuthorizationValidator()
+        ).use { component ->
+            val handyAuth = component.handyAuth
+            setupSuccessfulAuthorization(server, config)
+            performAuthorization(handyAuth)
+            server.waitForThisManyRequests(2)
+            handyAuth.logout()
 
-        performAuthorization(handyAuth)
-
-        server.waitForThisManyRequests(2)
-        runBlocking {
-            handyAuth.logout(context)
-
-            InternalHandyAuth(
+            // Create a new instance
+            createTestHandyAuthComponent(
                 config = config
-            ).apply {
-                assertThat(accessToken(context)).isEqualTo(HandyAccessToken())
-                assertThat(isAuthorized).isFalse()
+            ).use { newComponent ->
+                val newHandyAuth = newComponent.handyAuth
+                assertThat(newHandyAuth.accessToken()).isEqualTo(HandyAccessToken())
+                assertThat(newHandyAuth.isAuthorized).isFalse()
             }
         }
     }
 
     @Test
-    fun afterMemoryCleared_AccessTokenPersists() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
+    fun afterMemoryCleared_AccessTokenPersists() = runBlocking {
         val testInstantFactory = TestInstantFactory()
         val server = FakeAuthorizationServer()
         val config = createFakeConfig(server)
-        val handyAuth: HandyAuth = InternalHandyAuth(
+        createTestHandyAuthComponent(
             config = config,
-            scope = CoroutineScope(TestCoroutineDispatcher()),
-            authStateRepository = AuthStateRepository(
-                instantFactory = testInstantFactory
-            ),
-            authorizationValidator = TestAuthorizationValidator()
-        )
-        setupSuccessfulAuthorization(server, config)
+            testInstantFactory = testInstantFactory,
+            testAuthorizationValidator = TestAuthorizationValidator()
+        ).use { component ->
+            val handyAuth = component.handyAuth
+            setupSuccessfulAuthorization(server, config)
+            performAuthorization(handyAuth)
+            server.waitForThisManyRequests(2)
 
-        performAuthorization(handyAuth)
+            // Create a new instance
+            createTestHandyAuthComponent(
+                config = config,
+                testInstantFactory = testInstantFactory
+            ).use { newComponent ->
+                val newHandyAuth: HandyAuth = newComponent.handyAuth
 
-        server.waitForThisManyRequests(2)
-
-        //----------------------------------------
-
-        val newHandyAuth: HandyAuth = InternalHandyAuth(
-            config = config,
-            authStateRepository = AuthStateRepository(
-                instantFactory = testInstantFactory
-            )
-        )
-
-        runBlocking {
-            assertThat(newHandyAuth.accessToken(context)).isEqualTo(
-                HandyAccessToken(
-                    token = "exchange-response-access-token",
-                    tokenType = "Fake"
+                assertThat(newHandyAuth.accessToken()).isEqualTo(
+                    HandyAccessToken(
+                        token = "exchange-response-access-token",
+                        tokenType = "Fake"
+                    )
                 )
-            )
+            }
         }
     }
 
     @Test
-    fun afterMemoryCleared_WhenTokenExpired_AccessTokenRefreshes() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
+    fun afterMemoryCleared_WhenTokenExpired_AccessTokenRefreshes() = runBlocking {
         val testInstantFactory = TestInstantFactory()
         val server = FakeAuthorizationServer()
         val config = createFakeConfig(server)
-        val handyAuth: HandyAuth = InternalHandyAuth(
+        createTestHandyAuthComponent(
             config = config,
-            scope = CoroutineScope(TestCoroutineDispatcher()),
-            authStateRepository = AuthStateRepository(
-                instantFactory = testInstantFactory
-            ),
-            authorizationValidator = TestAuthorizationValidator()
-        )
-        setupSuccessfulAuthorization(server, config)
+            testInstantFactory = testInstantFactory,
+            testAuthorizationValidator = TestAuthorizationValidator()
+        ).use { component ->
+            val handyAuth = component.handyAuth
+            setupSuccessfulAuthorization(server, config)
+            performAuthorization(handyAuth)
+            server.waitForThisManyRequests(2)
 
-        performAuthorization(handyAuth)
+            // Create a new instance
+            createTestHandyAuthComponent(
+                config = config,
+                testInstantFactory = testInstantFactory
+            ).use { newComponent ->
+                val newHandyAuth: HandyAuth = newComponent.handyAuth
+                setupFreshAccessToken(server)
+                // Current time to compare to exchange-response token expiry - After, expired
+                testInstantFactory.now = Instant.ofEpochMilli(2000L)
 
-        server.waitForThisManyRequests(2)
-
-        //----------------------------------------
-
-        val newHandyAuth: HandyAuth = InternalHandyAuth(
-            config = config,
-            authStateRepository = AuthStateRepository(
-                instantFactory = testInstantFactory
-            )
-        )
-        setupFreshAccessToken(server)
-
-        // Current time to compare to exchange-response token expiry - After, expired
-        testInstantFactory.now = Instant.ofEpochMilli(2000L)
-        runBlocking {
-            assertThat(newHandyAuth.accessToken(context)).isEqualTo(
-                HandyAccessToken(
-                    token = "refresh-response-access-token",
-                    tokenType = "Fake"
+                assertThat(newHandyAuth.accessToken()).isEqualTo(
+                    HandyAccessToken(
+                        token = "refresh-response-access-token",
+                        tokenType = "Fake"
+                    )
                 )
-            )
+            }
         }
     }
 

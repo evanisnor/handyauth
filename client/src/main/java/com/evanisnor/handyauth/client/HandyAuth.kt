@@ -1,20 +1,22 @@
 package com.evanisnor.handyauth.client
 
-import android.content.Context
+import android.app.Application
 import androidx.activity.ComponentActivity
-import com.evanisnor.handyauth.client.internal.InternalHandyAuth
+import com.evanisnor.handyauth.client.internal.HandyAuthComponent
 
 interface HandyAuth {
 
     companion object {
-        fun create(config: HandyAuthConfig): HandyAuth = InternalHandyAuth(config)
+        fun create(application: Application, config: HandyAuthConfig): HandyAuth =
+            HandyAuthComponent.Builder()
+                .build(application, config).handyAuth
     }
 
     val isAuthorized: Boolean
 
     fun authorize(callingActivity: ComponentActivity)
 
-    suspend fun accessToken(context: Context): HandyAccessToken
+    suspend fun accessToken(): HandyAccessToken
 
-    fun logout(context: Context)
+    suspend fun logout()
 }

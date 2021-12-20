@@ -1,10 +1,6 @@
 package com.evanisnor.handyauth.client.fakeserver
 
-import androidx.activity.ComponentActivity
-import com.evanisnor.handyauth.client.HandyAuth
 import com.evanisnor.handyauth.client.HandyAuthConfig
-import com.evanisnor.handyauth.client.internal.InternalHandyAuth
-import kotlinx.coroutines.runBlocking
 
 class FakeAuthServerRobot(
     private val server: FakeAuthorizationServer
@@ -17,14 +13,6 @@ class FakeAuthServerRobot(
         tokenUrl = "${server.mockWebServerUrl}/token",
         scopes = listOf("test_scope_a", "test_scope_b")
     )
-
-    suspend fun createAuthorizedClient(componentActivity: ComponentActivity): HandyAuth {
-        val config = createFakeConfig()
-        server.acceptAuthorizationRequest(config)
-        return InternalHandyAuth(config).apply {
-            authorize(componentActivity)
-        }
-    }
 
     fun createExchangeResponse(): FakeExchangeResponse =
         FakeExchangeResponse(

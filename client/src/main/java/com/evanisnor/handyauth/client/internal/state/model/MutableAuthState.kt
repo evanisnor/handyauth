@@ -1,13 +1,11 @@
-package com.evanisnor.handyauth.client.internal.state
+package com.evanisnor.handyauth.client.internal.state.model
 
-import com.squareup.moshi.JsonClass
 import java.time.Instant
 
-@JsonClass(generateAdapter = true)
 data class MutableAuthState(
     var isAuthorized: Boolean = false,
     var refreshToken: String? = null,
-    @EpochMilli var tokenExpiry: Instant? = null,
+    var tokenExpiry: Instant? = null,
     var accessToken: String? = null,
     var accessTokenType: String? = null
 ) {
@@ -21,4 +19,9 @@ data class MutableAuthState(
         accessToken = null
         accessTokenType = null
     }
+
+    fun asAuthState() = AuthState(
+        isAuthorized, refreshToken, tokenExpiry, accessToken, accessTokenType
+    )
 }
+

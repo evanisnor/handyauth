@@ -1,29 +1,17 @@
 package com.evanisnor.handyauth.client.internal.state
 
-import android.content.Context
 import com.evanisnor.handyauth.client.HandyAccessToken
 import com.evanisnor.handyauth.client.internal.model.ExchangeResponse
 import com.evanisnor.handyauth.client.internal.model.RefreshResponse
-import com.evanisnor.handyauth.client.internal.time.DefaultInstantFactory
+import com.evanisnor.handyauth.client.internal.state.model.MutableAuthState
 import com.evanisnor.handyauth.client.internal.time.InstantFactory
-import com.squareup.moshi.Moshi
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
 class AuthStateRepository(
-    private val instantFactory: InstantFactory = DefaultInstantFactory(),
-    moshi: Moshi = Moshi.Builder()
-        .add(InstantJsonAdapter())
-        .build(),
-    private val authStateJsonAdapter: MutableAuthStateJsonAdapter = MutableAuthStateJsonAdapter(
-        moshi
-    )
+    private val instantFactory: InstantFactory,
+    private val cache: AuthStateCache
 ) {
-
-    companion object {
-        const val STATE_PREFS_NAME = "com.evanisnor.handyauth.client.internal"
-        private const val STATE_KEY = "authState"
-    }
 
     private val mutableAuthState: AtomicReference<MutableAuthState> = AtomicReference(
         MutableAuthState()
@@ -40,14 +28,11 @@ class AuthStateRepository(
 
     fun isTokenExpired(): Boolean = mutableAuthState.get().isExpired(instantFactory.now())
 
-    fun restore(context: Context) {
+    fun restore() {
         if (isRestored.get()) return
 
         mutableAccessToken.getAndUpdate {
-            sharedPrefs(context).apply {
-                val state = authStateJsonAdapter.fromJson(getString(STATE_KEY, null) ?: "{}")
-                mutableAuthState.set(state)
-            }
+            mutableAuthState.set(cache.read().asMutableAuthState())
             isRestored.getAndSet(true)
 
             HandyAccessToken(
@@ -57,7 +42,7 @@ class AuthStateRepository(
         }
     }
 
-    fun save(context: Context, exchangeResponse: ExchangeResponse) {
+    fun save(exchangeResponse: ExchangeResponse) {
         mutableAccessToken.getAndUpdate {
             val expiry = instantFactory.now().plusMillis(exchangeResponse.expiresIn)
 
@@ -71,11 +56,7 @@ class AuthStateRepository(
                 }
             }
 
-            sharedPrefs(context).edit()
-                .apply {
-                    putString(STATE_KEY, authStateJsonAdapter.toJson(mutableAuthState.get()))
-                    apply()
-                }
+            cache.save(mutableAuthState.get().asAuthState())
 
             HandyAccessToken(
                 token = exchangeResponse.accessToken,
@@ -84,7 +65,7 @@ class AuthStateRepository(
         }
     }
 
-    fun save(context: Context, refreshResponse: RefreshResponse) {
+    fun save(refreshResponse: RefreshResponse) {
         mutableAccessToken.getAndUpdate {
             val expiry = instantFactory.now().plusMillis(refreshResponse.expiresIn)
 
@@ -96,11 +77,7 @@ class AuthStateRepository(
                 }
             }
 
-            sharedPrefs(context).edit()
-                .apply {
-                    putString(STATE_KEY, authStateJsonAdapter.toJson(mutableAuthState.get()))
-                    apply()
-                }
+            cache.save(mutableAuthState.get().asAuthState())
 
             HandyAccessToken(
                 token = refreshResponse.accessToken,
@@ -109,22 +86,15 @@ class AuthStateRepository(
         }
     }
 
-    fun clear(context: Context) {
+    fun clear() {
         mutableAccessToken.getAndUpdate {
             mutableAuthState.getAndUpdate { state ->
                 state.clear()
-                sharedPrefs(context).edit().apply {
-                    clear()
-                    apply()
-                }
+                cache.clear()
                 state
             }
 
             HandyAccessToken()
         }
     }
-
-    @Synchronized
-    private fun sharedPrefs(context: Context) =
-        context.getSharedPreferences(STATE_PREFS_NAME, Context.MODE_PRIVATE)
 }

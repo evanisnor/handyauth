@@ -8,23 +8,13 @@ import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import okhttp3.logging.HttpLoggingInterceptor
 
 class InternalNetworkClient(
     private val config: HandyAuthConfig,
-    private val codeGenerator: CodeGenerator = CodeGenerator(),
-    private val moshi: Moshi = Moshi.Builder().build(),
-    private val client: OkHttpClient = OkHttpClient.Builder()
-        .addInterceptor(HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        })
-        .build(),
-    private val exchangeResponseJsonAdapter: ExchangeResponseJsonAdapter = ExchangeResponseJsonAdapter(
-        moshi
-    ),
-    private val refreshResponseJsonAdapter: RefreshResponseJsonAdapter = RefreshResponseJsonAdapter(
-        moshi
-    )
+    private val codeGenerator: CodeGenerator,
+    private val client: OkHttpClient,
+    private val exchangeResponseJsonAdapter: ExchangeResponseJsonAdapter,
+    private val refreshResponseJsonAdapter: RefreshResponseJsonAdapter
 ) {
 
     fun createCodeVerifier(): String {
