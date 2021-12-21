@@ -35,7 +35,8 @@ android {
         languageVersion = "1.5"
         jvmTarget = "11"
         freeCompilerArgs = listOf(
-            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi"
+            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-Xuse-experimental=kotlinx.coroutines.ObsoleteCoroutinesApi"
         )
     }
 

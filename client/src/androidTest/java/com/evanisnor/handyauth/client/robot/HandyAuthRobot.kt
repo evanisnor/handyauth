@@ -7,8 +7,6 @@ import androidx.test.core.app.launchActivity
 import com.evanisnor.handyauth.client.HandyAuth
 import com.evanisnor.handyauth.client.HandyAuthConfig
 import com.evanisnor.handyauth.client.fakes.*
-import com.evanisnor.handyauth.client.fakes.TestSecureModule
-import com.evanisnor.handyauth.client.fakes.TestStateModule
 import com.evanisnor.handyauth.client.internal.HandyAuthComponent
 
 class HandyAuthRobot {
@@ -26,9 +24,9 @@ class HandyAuthRobot {
         config: HandyAuthConfig = createFakeConfig(),
         testInstantFactory: TestInstantFactory? = null,
         testAuthorizationValidator: TestAuthorizationValidator? = null
-    ): HandyAuthComponent {
+    ): TestHandyAuthComponent {
         val application = ApplicationProvider.getApplicationContext() as Application
-        return HandyAuthComponent.Builder()
+        val handyAuthComponent= HandyAuthComponent.Builder()
             .stateModule(
                 TestStateModule(
                     testInstantFactory = testInstantFactory
@@ -40,14 +38,18 @@ class HandyAuthRobot {
                 )
             )
             .build(application, config)
+        return TestHandyAuthComponent(handyAuthComponent)
     }
 
 
-     fun performAuthorization(handyAuth: HandyAuth) {
+    fun performAuthorization(
+        handyAuth: HandyAuth,
+        resultCallback: (HandyAuth.Result) -> Unit = {}
+    ) {
         launchActivity<TestLoginActivity>()
             .moveToState(Lifecycle.State.CREATED)
             .onActivity { activity ->
-                handyAuth.authorize(activity)
+                handyAuth.authorize(activity, resultCallback)
             }
             .moveToState(Lifecycle.State.RESUMED)
     }

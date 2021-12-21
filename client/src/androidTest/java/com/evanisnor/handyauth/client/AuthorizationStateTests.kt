@@ -11,7 +11,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class AuthorizationTests {
+class AuthorizationStateTests {
 
     private val fakeAuthServerRobot = FakeAuthServerRobot()
     private val handyAuthRobot = HandyAuthRobot()
@@ -30,7 +30,6 @@ class AuthorizationTests {
             server.waitForThisManyRequests(2)
 
             Truth.assertThat(handyAuth.isAuthorized).isTrue()
-
         }
     }
 

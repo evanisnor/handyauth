@@ -21,7 +21,6 @@ import com.evanisnor.handyauth.client.internal.state.model.AuthStateJsonAdapter
 import com.evanisnor.handyauth.client.internal.time.InstantFactory
 import com.squareup.moshi.Moshi
 import okhttp3.OkHttpClient
-import java.io.Closeable
 
 internal class HandyAuthComponent(
     private val context: Context,
@@ -29,7 +28,7 @@ internal class HandyAuthComponent(
     private val stateModule: StateModule,
     private val secureModule: SecureModule,
     private val networkModule: NetworkModule
-) : Closeable {
+) {
 
     class Builder {
 
@@ -98,9 +97,5 @@ internal class HandyAuthComponent(
         authStateRepository = authStateRepository,
         authorizationValidator = authorizationValidator
     )
-
-    override fun close() {
-        persistentCache.clear()
-    }
 
 }

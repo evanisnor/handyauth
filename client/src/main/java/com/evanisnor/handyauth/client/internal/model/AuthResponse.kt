@@ -5,6 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class AuthResponse(
-    val authorizationCode: String,
-    val state: String
+    val authorizationCode: String? = null,
+    val state: String? = null,
+    val error: RemoteError? = null
 ) : Parcelable

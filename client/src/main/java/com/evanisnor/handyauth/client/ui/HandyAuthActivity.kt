@@ -14,6 +14,7 @@ import com.evanisnor.handyauth.client.databinding.HandyAuthActivityBinding
 import com.evanisnor.handyauth.client.internal.AuthResponseContract
 import com.evanisnor.handyauth.client.internal.model.AuthRequest
 import com.evanisnor.handyauth.client.internal.model.AuthResponse
+import com.evanisnor.handyauth.client.internal.model.RemoteError
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 class HandyAuthActivity : AppCompatActivity() {
@@ -33,11 +34,13 @@ class HandyAuthActivity : AppCompatActivity() {
     }
 
     private var authRequest: AuthRequest? = null
+    private var redirectUrl: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         authRequest = intent.getParcelableExtra(authorizationRequestExtra)
+        redirectUrl = authRequest?.config?.redirectUrl
 
         HandyAuthActivityBinding.inflate(layoutInflater).apply {
             setContentView(webView)
@@ -59,19 +62,22 @@ class HandyAuthActivity : AppCompatActivity() {
 
         webViewClient = object : WebViewClient() {
 
+
             override fun shouldOverrideUrlLoading(
                 view: WebView?,
                 request: WebResourceRequest?
             ): Boolean {
                 val urlString = request?.url.toString()
-                authRequest?.config?.redirectUrl?.let {
-                    if (urlString.startsWith(it) && authRequest != null) {
-                        handleAuthorizationResponse(it, urlString) { response ->
+                redirectUrl?.let { redirectUrl ->
+                    if (urlString.startsWith(redirectUrl)) {
+                        handleAuthorizationResponse(
+                            redirectUrl,
+                            urlString
+                        ) { response ->
                             setResult(Activity.RESULT_OK, Intent().apply {
                                 putExtra(authorizationResponseExtra, response)
                             })
                         }
-
                         finish()
                         return false
                     }
@@ -85,22 +91,34 @@ class HandyAuthActivity : AppCompatActivity() {
                 request: WebResourceRequest?,
                 errorResponse: WebResourceResponse?
             ) {
-                setResult(Activity.RESULT_CANCELED, Intent())
-                finish()
+                if (errorResponse != null && errorResponse.statusCode >= 500) {
+                    setResult(Activity.RESULT_OK, Intent().apply {
+                        putExtra(
+                            authorizationResponseExtra,
+                            AuthResponse(
+                                error = RemoteError(errorResponse.statusCode)
+                            )
+                        )
+                    })
+                    finish()
+                    return
+                }
             }
 
         }
     }
 
-    fun handleAuthorizationResponse(
+    private fun handleAuthorizationResponse(
         redirectUrl: String,
         url: String,
         onAuthResponse: (AuthResponse) -> Unit
     ) {
         url.replace(redirectUrl, "https://ok").toHttpUrlOrNull()?.let {
-
             val code = it.queryParameter("code")
             val state = it.queryParameter("state")
+            val error = it.queryParameter("error")
+            val errorDescription = it.queryParameter("error_description")
+            val errorUri = it.queryParameter("error_uri")
 
             if (code != null && state != null) {
                 onAuthResponse(
@@ -109,9 +127,17 @@ class HandyAuthActivity : AppCompatActivity() {
                         state = state
                     )
                 )
-
+            } else {
+                onAuthResponse(
+                    AuthResponse(
+                        error = RemoteError(
+                            error = error?.urlDecode(),
+                            description = errorDescription?.urlDecode(),
+                            uri = errorUri?.urlDecode()
+                        )
+                    )
+                )
             }
         }
     }
-
 }

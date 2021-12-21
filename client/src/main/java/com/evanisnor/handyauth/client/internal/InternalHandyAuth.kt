@@ -11,7 +11,7 @@ import com.evanisnor.handyauth.client.internal.state.AuthStateRepository
 import com.evanisnor.handyauth.client.ui.HandyAuthActivity
 import kotlinx.coroutines.*
 
-internal class InternalHandyAuth @ObsoleteCoroutinesApi constructor(
+internal class InternalHandyAuth constructor(
     private val internalNetworkClient: InternalNetworkClient,
     private val authStateRepository: AuthStateRepository,
     private val authorizationValidator: AuthorizationValidator,
@@ -21,7 +21,10 @@ internal class InternalHandyAuth @ObsoleteCoroutinesApi constructor(
     override val isAuthorized: Boolean
         get() = authStateRepository.isAuthorized
 
-    override fun authorize(callingActivity: ComponentActivity) {
+    override fun authorize(
+        callingActivity: ComponentActivity,
+        resultCallback: (HandyAuth.Result) -> Unit
+    ) {
         val codeVerifier = internalNetworkClient.createCodeVerifier()
         val authorizationRequest = internalNetworkClient.buildAuthorizationRequest(codeVerifier)
 
@@ -31,10 +34,11 @@ internal class InternalHandyAuth @ObsoleteCoroutinesApi constructor(
         ) { authResponse ->
             scope.launch {
                 authResponse?.let {
-                    handleAuthorization(
+                    handleAuthorizationResponse(
                         authorizationRequest,
                         authResponse,
-                        codeVerifier
+                        codeVerifier,
+                        resultCallback
                     )
                 }
             }
@@ -56,18 +60,27 @@ internal class InternalHandyAuth @ObsoleteCoroutinesApi constructor(
         authStateRepository.clear()
     }
 
-    private suspend fun handleAuthorization(
+    private suspend fun handleAuthorizationResponse(
         authorizationRequest: AuthRequest,
         authResponse: AuthResponse,
-        codeVerifier: String
+        codeVerifier: String,
+        resultCallback: (HandyAuth.Result) -> Unit
     ) {
-        if (authorizationValidator.isValid(authorizationRequest, authResponse)) {
+        if (authResponse.error != null) {
+            resultCallback(authResponse.error.toResultError())
+        } else if (
+            authorizationValidator.isValid(authorizationRequest, authResponse) &&
+            authResponse.authorizationCode != null
+        ) {
             internalNetworkClient.exchangeCodeForTokens(
-                authorizationResponse = authResponse,
+                authorizationCode = authResponse.authorizationCode,
                 codeVerifier = codeVerifier
             )?.also { exchangeResponse ->
                 authStateRepository.save(exchangeResponse)
+                resultCallback(HandyAuth.Result.Authorized)
             }
+        } else {
+            resultCallback(HandyAuth.Result.UnknownError())
         }
     }
 }

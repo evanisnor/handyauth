@@ -30,7 +30,7 @@ class InternalNetworkClient(
     )
 
     suspend fun exchangeCodeForTokens(
-        authorizationResponse: AuthResponse,
+        authorizationCode: String,
         codeVerifier: String
     ): ExchangeResponse? {
         val exchangeRequest = Request.Builder()
@@ -40,7 +40,7 @@ class InternalNetworkClient(
                     .add("grant_type", "authorization_code")
                     .add("client_id", config.clientId)
                     .add("code_verifier", codeVerifier)
-                    .add("code", authorizationResponse.authorizationCode)
+                    .add("code", authorizationCode)
                     .add("redirect_uri", config.redirectUrl)
                     .build()
             )

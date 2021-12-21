@@ -8,6 +8,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import java.net.URLEncoder
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -49,6 +50,30 @@ class FakeAuthorizationServer {
         )
     }
 
+    fun errorAuthorizationRequest(
+        config: HandyAuthConfig,
+        error: String,
+        errorDescription: String,
+        errorUri: String
+    ) {
+        mockWebServer.enqueue(
+            MockResponse().setResponseCode(302)
+                .addHeader(
+                    "Location",
+                    "${config.redirectUrl}?" +
+                            "error=${error.urlEncode()}&" +
+                            "error_description=${errorDescription.urlEncode()}&" +
+                            "error_uri=${errorUri.urlEncode()}"
+                )
+        )
+    }
+
+    fun returnServerError() {
+        mockWebServer.enqueue(
+            MockResponse().setResponseCode(500)
+        )
+    }
+
     fun acceptExchangeRequest(response: FakeExchangeResponse) {
         mockWebServer.enqueue(
             MockResponse().setBody(
@@ -64,4 +89,6 @@ class FakeAuthorizationServer {
             )
         )
     }
+
+    fun String.urlEncode(): String = URLEncoder.encode(this, "UTF-8")
 }

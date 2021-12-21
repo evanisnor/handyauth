@@ -2,6 +2,7 @@ package com.evanisnor.handyauth.example
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.evanisnor.handyauth.R
 import com.evanisnor.handyauth.client.HandyAuth
@@ -19,10 +20,28 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.main_activity)
 
         if (!handyAuth.isAuthorized) {
-            handyAuth.authorize(this)
+            handyAuth.authorize(this) { result ->
+                when (result) {
+                    is HandyAuth.Result.Success -> {
+                        onAuthenticated()
+                    }
+                    is HandyAuth.Result.Error -> {
+                        Log.e("ExampleApp", result.error.toString())
+                        onError()
+                    }
+                }
+            }
         } else {
-            startActivity(Intent(this, AuthenticatedActivity::class.java))
+            onAuthenticated()
         }
+    }
+
+    private fun onAuthenticated() {
+        startActivity(Intent(this, AuthenticatedActivity::class.java))
+    }
+
+    private fun onError() {
+        startActivity(Intent(this, LoginErrorActivity::class.java))
     }
 
 

@@ -30,6 +30,23 @@ class FakeAuthServerRobot {
         server.denyAuthorizationRequest()
     }
 
+    fun setupFailedAuthorization(
+        server: FakeAuthorizationServer,
+        config: HandyAuthConfig,
+        error: String,
+        errorDescription: String,
+        errorUri: String
+    ) {
+        // test server return an error
+        server.errorAuthorizationRequest(config, error, errorDescription, errorUri)
+    }
+
+    fun setupServerError(
+        server: FakeAuthorizationServer
+    ) {
+        server.returnServerError()
+    }
+
     fun setupFreshAccessToken(server: FakeAuthorizationServer) {
         // test server enqueue fresh access token
         server.acceptRefreshRequest(response = createRefreshResponse())
