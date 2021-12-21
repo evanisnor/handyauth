@@ -1,10 +1,10 @@
-package com.evanisnor.handyauth.client
+package com.evanisnor.handyauth.client.fakes
 
 import com.evanisnor.handyauth.client.internal.secure.AuthorizationValidator
 import com.evanisnor.handyauth.client.internal.secure.CodeGenerator
 import com.evanisnor.handyauth.client.internal.secure.DefaultSecureModule
 import com.evanisnor.handyauth.client.internal.secure.SecureModule
-import com.evanisnor.handyauth.client.util.TestAuthorizationValidator
+import com.evanisnor.handyauth.client.fakes.TestAuthorizationValidator
 
 internal class TestSecureModule(
     private val defaultSecureModule: DefaultSecureModule = DefaultSecureModule(),

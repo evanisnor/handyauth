@@ -1,4 +1,4 @@
-package com.evanisnor.handyauth.client.util
+package com.evanisnor.handyauth.client.fakes
 
 import com.evanisnor.handyauth.client.internal.model.AuthRequest
 import com.evanisnor.handyauth.client.internal.model.AuthResponse

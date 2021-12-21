@@ -1,13 +1,15 @@
-package com.evanisnor.handyauth.client
+package com.evanisnor.handyauth.client.robot
 
 import android.app.Application
 import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.core.app.launchActivity
+import com.evanisnor.handyauth.client.HandyAuth
+import com.evanisnor.handyauth.client.HandyAuthConfig
+import com.evanisnor.handyauth.client.fakes.*
+import com.evanisnor.handyauth.client.fakes.TestSecureModule
+import com.evanisnor.handyauth.client.fakes.TestStateModule
 import com.evanisnor.handyauth.client.internal.HandyAuthComponent
-import com.evanisnor.handyauth.client.util.TestAuthorizationValidator
-import com.evanisnor.handyauth.client.util.TestInstantFactory
-import com.evanisnor.handyauth.client.util.TestLoginActivity
 
 class HandyAuthRobot {
 

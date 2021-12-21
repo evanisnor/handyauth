@@ -1,12 +1,12 @@
-package com.evanisnor.handyauth.client
+package com.evanisnor.handyauth.client.fakes
 
 import android.content.Context
+import com.evanisnor.handyauth.client.HandyAuthConfig
 import com.evanisnor.handyauth.client.internal.state.AuthStateCache
 import com.evanisnor.handyauth.client.internal.state.DefaultStateModule
 import com.evanisnor.handyauth.client.internal.state.StateModule
 import com.evanisnor.handyauth.client.internal.state.model.AuthStateJsonAdapter
 import com.evanisnor.handyauth.client.internal.time.InstantFactory
-import com.evanisnor.handyauth.client.util.TestInstantFactory
 import com.squareup.moshi.Moshi
 
 internal class TestStateModule(
