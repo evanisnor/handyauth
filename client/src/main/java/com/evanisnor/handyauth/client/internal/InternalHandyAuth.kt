@@ -11,7 +11,7 @@ import com.evanisnor.handyauth.client.internal.state.AuthStateRepository
 import com.evanisnor.handyauth.client.ui.HandyAuthActivity
 import kotlinx.coroutines.*
 
-internal class InternalHandyAuth(
+internal class InternalHandyAuth @ObsoleteCoroutinesApi constructor(
     private val internalNetworkClient: InternalNetworkClient,
     private val authStateRepository: AuthStateRepository,
     private val authorizationValidator: AuthorizationValidator,
@@ -30,7 +30,7 @@ internal class InternalHandyAuth(
             authorizationRequest = authorizationRequest
         ) { authResponse ->
             scope.launch {
-                authResponse?.also {
+                authResponse?.let {
                     handleAuthorization(
                         authorizationRequest,
                         authResponse,
@@ -41,17 +41,16 @@ internal class InternalHandyAuth(
         }
     }
 
-    override suspend fun accessToken(): HandyAccessToken =
-        withContext(scope.coroutineContext) {
-            if (authStateRepository.isTokenExpired()) {
-                internalNetworkClient.refresh(authStateRepository.refreshToken)
-                    ?.also { refreshResponse ->
-                        authStateRepository.save(refreshResponse)
-                    }
-            }
-
-            authStateRepository.accessToken
+    override suspend fun accessToken(): HandyAccessToken = withContext(scope.coroutineContext) {
+        if (authStateRepository.isTokenExpired()) {
+            internalNetworkClient.refresh(authStateRepository.refreshToken)
+                ?.also { refreshResponse ->
+                    authStateRepository.save(refreshResponse)
+                }
         }
+
+        authStateRepository.accessToken
+    }
 
     override suspend fun logout(): Unit = withContext(scope.coroutineContext) {
         authStateRepository.clear()

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">handyauth</string>
+    <string name="authenticated_successfully">Authenticated successfully!</string>
+    <string name="login_error">LOGIN ERROR</string>
 </resources>
