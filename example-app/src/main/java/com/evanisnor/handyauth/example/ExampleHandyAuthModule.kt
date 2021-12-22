@@ -12,9 +12,14 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 object ExampleHandyAuthModule {
 
-//    @Provides
-//    fun handyAuthConfig(): HandyAuthConfig = HandyAuthConfig(
-//    )
+    @Provides
+    fun handyAuthConfig(): HandyAuthConfig = HandyAuthConfig(
+        clientId = "",
+        redirectUrl = "",
+        authorizationUrl = "",
+        tokenUrl = "",
+        scopes = listOf()
+    )
 
     @Provides
     fun handyAuth(application: Application, handyAuthConfig: HandyAuthConfig): HandyAuth =

@@ -2,4 +2,5 @@
     <string name="app_name">handyauth</string>
     <string name="authenticated_successfully">Authenticated successfully!</string>
     <string name="login_error">LOGIN ERROR</string>
+    <string name="log_out">Log out</string>
 </resources>

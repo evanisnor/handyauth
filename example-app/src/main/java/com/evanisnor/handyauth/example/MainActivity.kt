@@ -37,7 +37,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onAuthenticated() {
-        startActivity(Intent(this, AuthenticatedActivity::class.java))
+        startActivity(Intent(this, AuthenticatedActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        })
     }
 
     private fun onError() {
