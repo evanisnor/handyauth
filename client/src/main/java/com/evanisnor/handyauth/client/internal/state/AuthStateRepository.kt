@@ -17,7 +17,7 @@ class AuthStateRepository(
     fun isTokenExpired(): Boolean = cache.read().isExpired(instantFactory.now())
 
     fun save(exchangeResponse: ExchangeResponse) {
-        val expiry = instantFactory.now().plusMillis(exchangeResponse.expiresIn)
+        val expiry = instantFactory.now().plusSeconds(exchangeResponse.expiresIn)
 
         val updatedAuthState = cache.read().asMutableAuthState().apply {
             isAuthorized = true
@@ -31,7 +31,7 @@ class AuthStateRepository(
     }
 
     fun save(refreshResponse: RefreshResponse) {
-        val expiry = instantFactory.now().plusMillis(refreshResponse.expiresIn)
+        val expiry = instantFactory.now().plusSeconds(refreshResponse.expiresIn)
 
         val updatedAuthState = cache.read().asMutableAuthState().apply {
             tokenExpiry = expiry
