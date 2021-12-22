@@ -58,7 +58,7 @@ class RefreshTests {
             handyAuthRobot.performAuthorization(handyAuth)
             server.waitForThisManyRequests(2)
             // Current time to compare to exchange-response token expiry - After, expired
-            testInstantFactory.now = Instant.ofEpochMilli(2000L)
+            testInstantFactory.now = Instant.ofEpochSecond(2000L)
 
             Truth.assertThat(handyAuth.accessToken()).isEqualTo(
                 HandyAccessToken(

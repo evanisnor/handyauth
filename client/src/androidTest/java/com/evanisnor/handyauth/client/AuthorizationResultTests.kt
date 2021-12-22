@@ -69,6 +69,32 @@ class AuthorizationResultTests {
     }
 
     @Test
+    fun afterAuthorizationFailed_WhenServerReturnsForbidden_ResultIsDenied() = runBlocking {
+        val server = FakeAuthorizationServer()
+        val config = fakeAuthServerRobot.createFakeConfig(server)
+        handyAuthRobot.createTestHandyAuthComponent(
+            config = config,
+            testAuthorizationValidator = TestAuthorizationValidator()
+        ).use { component ->
+            val receivedResult = AtomicReference<HandyAuth.Result>()
+
+            val handyAuth: HandyAuth = component.handyAuth
+            fakeAuthServerRobot.setupFailedAuthorization(server)
+            handyAuthRobot.performAuthorization(handyAuth, receivedResult::set)
+            server.waitForThisManyRequests(1)
+
+            receivedResult.get().let { result ->
+                assertThat(result).isInstanceOf(HandyAuth.Result.Denied::class.java)
+                (result as HandyAuth.Result.Error).let { errorResult ->
+                    assertThat(errorResult.error).isNull()
+                    assertThat(errorResult.description).isNull()
+                    assertThat(errorResult.uri).isNull()
+                }
+            }
+        }
+    }
+
+    @Test
     fun afterAuthorizationFailed_WhenLoginIsForbidden_ResultIsDenied() = runBlocking {
         val server = FakeAuthorizationServer()
         val config = fakeAuthServerRobot.createFakeConfig(server)

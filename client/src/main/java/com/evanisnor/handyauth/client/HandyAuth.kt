@@ -32,7 +32,7 @@ interface HandyAuth {
         object Authorized : Success()
         object ServerError : Error("Server is unreachable", null, null)
 
-        class Denied(error: String, description: String?, uri: String?) :
+        class Denied(error: String?, description: String?, uri: String?) :
             Error(error, description, uri)
 
         class ParameterError(error: String?, description: String?, uri: String?) :

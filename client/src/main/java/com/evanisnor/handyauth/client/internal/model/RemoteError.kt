@@ -16,6 +16,8 @@ data class RemoteError(
         "access_denied" -> HandyAuth.Result.Denied(error, description, uri)
         is String -> HandyAuth.Result.ParameterError(error, description, uri)
         else -> when (statusCode) {
+            401 -> HandyAuth.Result.Denied(error, description, uri)
+            403 -> HandyAuth.Result.Denied(error, description, uri)
             in 500..599 -> HandyAuth.Result.ServerError
             else -> HandyAuth.Result.UnknownError(error, description, uri)
         }

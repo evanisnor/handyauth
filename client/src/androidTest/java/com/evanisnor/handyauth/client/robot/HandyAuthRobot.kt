@@ -8,6 +8,8 @@ import com.evanisnor.handyauth.client.HandyAuth
 import com.evanisnor.handyauth.client.HandyAuthConfig
 import com.evanisnor.handyauth.client.fakes.*
 import com.evanisnor.handyauth.client.internal.HandyAuthComponent
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class HandyAuthRobot {
 
@@ -26,7 +28,7 @@ class HandyAuthRobot {
         testAuthorizationValidator: TestAuthorizationValidator? = null
     ): TestHandyAuthComponent {
         val application = ApplicationProvider.getApplicationContext() as Application
-        val handyAuthComponent= HandyAuthComponent.Builder()
+        val handyAuthComponent = HandyAuthComponent.Builder()
             .stateModule(
                 TestStateModule(
                     testInstantFactory = testInstantFactory
@@ -46,11 +48,16 @@ class HandyAuthRobot {
         handyAuth: HandyAuth,
         resultCallback: (HandyAuth.Result) -> Unit = {}
     ) {
+        val latch = CountDownLatch(1)
         launchActivity<TestLoginActivity>()
             .moveToState(Lifecycle.State.CREATED)
             .onActivity { activity ->
-                handyAuth.authorize(activity, resultCallback)
+                handyAuth.authorize(activity) { result ->
+                    resultCallback(result)
+                    latch.countDown()
+                }
             }
             .moveToState(Lifecycle.State.RESUMED)
+        latch.await(10, TimeUnit.SECONDS)
     }
 }

@@ -91,7 +91,7 @@ class HandyAuthActivity : AppCompatActivity() {
                 request: WebResourceRequest?,
                 errorResponse: WebResourceResponse?
             ) {
-                if (errorResponse != null && errorResponse.statusCode >= 500) {
+                if (errorResponse != null) {
                     setResult(Activity.RESULT_OK, Intent().apply {
                         putExtra(
                             authorizationResponseExtra,
