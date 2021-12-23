@@ -65,7 +65,7 @@ internal class HandyAuthComponent(
     val persistentCache: AuthStateCache =
         stateModule.persistentCache(context, config, authStateJsonAdapter)
 
-    private val memoryCache: AuthStateCache = stateModule.memoryCache(persistentCache)
+    val memoryCache: AuthStateCache = stateModule.memoryCache(persistentCache)
 
     private val authStateRepository = AuthStateRepository(
         instantFactory = instantFactory,

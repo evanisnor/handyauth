@@ -9,6 +9,8 @@ internal class TestHandyAuthComponent(
 
     val handyAuth = handyAuthComponent.handyAuth
 
+    val memoryCache = handyAuthComponent.memoryCache
+
     override fun close() {
         handyAuthComponent.persistentCache.clear()
     }

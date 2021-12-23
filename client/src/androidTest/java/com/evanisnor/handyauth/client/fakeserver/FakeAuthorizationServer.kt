@@ -90,5 +90,5 @@ class FakeAuthorizationServer {
         )
     }
 
-    fun String.urlEncode(): String = URLEncoder.encode(this, "UTF-8")
+    private fun String.urlEncode(): String = URLEncoder.encode(this, "UTF-8")
 }

@@ -34,6 +34,7 @@ class AuthStateRepository(
         val expiry = instantFactory.now().plusSeconds(refreshResponse.expiresIn)
 
         val updatedAuthState = cache.read().asMutableAuthState().apply {
+            refreshToken = refreshResponse.refreshToken ?: this.refreshToken
             tokenExpiry = expiry
             accessToken = refreshResponse.accessToken
             accessTokenType = refreshResponse.tokenType

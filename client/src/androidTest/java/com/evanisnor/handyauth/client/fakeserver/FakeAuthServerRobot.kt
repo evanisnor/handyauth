@@ -52,6 +52,11 @@ class FakeAuthServerRobot {
         server.acceptRefreshRequest(response = createRefreshResponse())
     }
 
+    fun setupNewRefreshToken(server: FakeAuthorizationServer) {
+        // test server enqueue new refresh token
+        server.acceptRefreshRequest(response = createRefreshResponseWithNewRefreshToken())
+    }
+
     private fun createExchangeResponse(): FakeExchangeResponse =
         FakeExchangeResponse(
             accessToken = "exchange-response-access-token",
@@ -64,6 +69,16 @@ class FakeAuthServerRobot {
     private fun createRefreshResponse(): FakeRefreshResponse =
         FakeRefreshResponse(
             accessToken = "refresh-response-access-token",
+            refreshToken = null,
+            tokenType = "Fake",
+            expiresIn = 1000L,
+            scope = "test_scope_a test_scope_b"
+        )
+
+    private fun createRefreshResponseWithNewRefreshToken(): FakeRefreshResponse =
+        FakeRefreshResponse(
+            accessToken = "updated-refresh-token-access",
+            refreshToken = "new-refresh-token",
             tokenType = "Fake",
             expiresIn = 1000L,
             scope = "test_scope_a test_scope_b"
