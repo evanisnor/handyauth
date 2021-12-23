@@ -3,6 +3,7 @@ plugins {
     id("kotlin-android")
     id("kotlin-kapt")
     id("kotlin-parcelize")
+    id("maven-publish")
 }
 
 android {
@@ -43,6 +44,19 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
+        }
+    }
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                from(components["release"])
+                group = "com.evanisnor.handyauth"
+                artifactId = "client"
+                version = project.version.toString()
+            }
         }
     }
 }
