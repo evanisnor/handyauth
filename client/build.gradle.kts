@@ -18,6 +18,7 @@ android {
 
     packagingOptions {
         resources {
+            excludes.add("META-INF/versions/**/*")
             pickFirsts.add("META-INF/AL2.0")
             pickFirsts.add("META-INF/LGPL2.1")
         }
@@ -36,9 +37,13 @@ android {
         languageVersion = "1.5"
         jvmTarget = "11"
         freeCompilerArgs = listOf(
-            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-Xuse-experimental=kotlinx.coroutines.ObsoleteCoroutinesApi"
+            "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-Xopt-in=kotlinx.coroutines.ObsoleteCoroutinesApi"
         )
+    }
+
+    lint {
+        isWarningsAsErrors = true
     }
 
     testOptions {
