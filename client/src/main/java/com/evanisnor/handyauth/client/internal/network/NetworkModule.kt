@@ -6,41 +6,18 @@ import com.evanisnor.handyauth.client.internal.model.RefreshResponseJsonAdapter
 import com.evanisnor.handyauth.client.internal.secure.CodeGenerator
 import com.squareup.moshi.Moshi
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 
 internal interface NetworkModule {
 
-    fun okHttpClient(): OkHttpClient
+    fun okHttpClient(): OkHttpClient = OkHttpClient.Builder().build()
 
-    fun exchangeResponseJsonAdapter(moshi: Moshi): ExchangeResponseJsonAdapter
-
-    fun refreshResponseJsonAdapter(moshi: Moshi): RefreshResponseJsonAdapter
-
-    fun internalNetworkClient(
-        config: HandyAuthConfig,
-        codeGenerator: CodeGenerator,
-        okHttpClient: OkHttpClient,
-        exchangeResponseJsonAdapter: ExchangeResponseJsonAdapter,
-        refreshResponseJsonAdapter: RefreshResponseJsonAdapter
-    ): InternalNetworkClient
-
-}
-
-internal class DefaultNetworkModule : NetworkModule {
-
-    override fun okHttpClient(): OkHttpClient = OkHttpClient.Builder()
-        .addInterceptor(HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        })
-        .build()
-
-    override fun exchangeResponseJsonAdapter(moshi: Moshi): ExchangeResponseJsonAdapter =
+    fun exchangeResponseJsonAdapter(moshi: Moshi): ExchangeResponseJsonAdapter =
         ExchangeResponseJsonAdapter(moshi)
 
-    override fun refreshResponseJsonAdapter(moshi: Moshi): RefreshResponseJsonAdapter =
+    fun refreshResponseJsonAdapter(moshi: Moshi): RefreshResponseJsonAdapter =
         RefreshResponseJsonAdapter(moshi)
 
-    override fun internalNetworkClient(
+    fun internalNetworkClient(
         config: HandyAuthConfig,
         codeGenerator: CodeGenerator,
         okHttpClient: OkHttpClient,
@@ -53,4 +30,5 @@ internal class DefaultNetworkModule : NetworkModule {
         exchangeResponseJsonAdapter = exchangeResponseJsonAdapter,
         refreshResponseJsonAdapter = refreshResponseJsonAdapter
     )
+
 }
