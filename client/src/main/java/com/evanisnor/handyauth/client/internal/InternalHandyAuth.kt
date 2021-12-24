@@ -80,7 +80,7 @@ internal class InternalHandyAuth constructor(
                 resultCallback(HandyAuth.Result.Authorized)
             }
         } else {
-            resultCallback(HandyAuth.Result.UnknownError())
+            resultCallback(HandyAuth.Result.Error.UnknownError)
         }
     }
 }

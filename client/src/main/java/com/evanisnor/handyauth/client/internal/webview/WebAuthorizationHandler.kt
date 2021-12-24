@@ -8,10 +8,13 @@ import android.webkit.WebViewClient
 import com.evanisnor.handyauth.client.internal.ext.isAuthorizationRedirect
 import com.evanisnor.handyauth.client.internal.model.AuthResponse
 import com.evanisnor.handyauth.client.internal.model.RemoteError
-import com.evanisnor.handyauth.client.ui.urlDecode
+import com.evanisnor.handyauth.client.internal.ext.urlDecode
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
-internal class WebAuthorizationInterpreter(
+/**
+ * Provides a WebView that can be used to handle OAuth2 responses from an authorization server.
+ */
+internal class WebAuthorizationHandler(
     private val redirectUrl: String,
     private val onAuthResponse: (AuthResponse) -> Unit
 ) {

@@ -22,6 +22,13 @@ import com.evanisnor.handyauth.client.internal.time.InstantFactory
 import com.squareup.moshi.Moshi
 import okhttp3.OkHttpClient
 
+/**
+ * Dependency graph for HandyAuth instances.
+ *
+ * Patterns used for DI in HandyAuth resemble those that may be produced by Dagger, however
+ * HandyAuth does not depend on Dagger. This decision was made to keep HandyAuth light and reduce
+ * usage of third-party dependencies
+ */
 internal class HandyAuthComponent(
     private val context: Context,
     private val config: HandyAuthConfig,
@@ -30,7 +37,11 @@ internal class HandyAuthComponent(
     private val networkModule: NetworkModule
 ) {
 
-    class Builder {
+    /**
+     * Build the HandyAuth dependency graph. Custom dependency modules may be provided for testing
+     * purposes.
+     */
+    internal class Builder {
 
         private var stateModule: StateModule = DefaultStateModule()
         private var secureModule: SecureModule = DefaultSecureModule()
@@ -57,27 +68,36 @@ internal class HandyAuthComponent(
 
     }
 
-    // State Module
+    // region Graph Composition
+
+    // region State Module
+
     private val moshi: Moshi = stateModule.moshi()
     private val instantFactory: InstantFactory = stateModule.instantFactory()
     private val authStateJsonAdapter: AuthStateJsonAdapter = stateModule.authStateJsonAdapter(moshi)
 
-    val persistentCache: AuthStateCache =
+    internal val persistentCache: AuthStateCache =
         stateModule.persistentCache(context, config, authStateJsonAdapter)
 
-    val memoryCache: AuthStateCache = stateModule.memoryCache(persistentCache)
+    internal val memoryCache: AuthStateCache = stateModule.memoryCache(persistentCache)
 
     private val authStateRepository = AuthStateRepository(
         instantFactory = instantFactory,
         cache = memoryCache
     )
 
-    // Secure Module
+    // endregion
+
+    // region Secure Module
+
     private val authorizationValidator: AuthorizationValidator =
         secureModule.authorizationValidator()
     private val codeGenerator: CodeGenerator = secureModule.codeGenerator()
 
-    // Network Module
+    // endregion
+
+    // region Network Module
+
     private val okHttpClient: OkHttpClient = networkModule.okHttpClient()
     private val exchangeResponseJsonAdapter: ExchangeResponseJsonAdapter =
         networkModule.exchangeResponseJsonAdapter(moshi)
@@ -91,8 +111,15 @@ internal class HandyAuthComponent(
         refreshResponseJsonAdapter = refreshResponseJsonAdapter
     )
 
+    // endregion
 
-    val handyAuth: HandyAuth = InternalHandyAuth(
+    // endregion
+
+    /**
+     * An instance of HandyAuth, created with dependencies as provided by this [HandyAuthComponent]
+     * instance.
+     */
+    internal val handyAuth: HandyAuth = InternalHandyAuth(
         internalNetworkClient = internalNetworkClient,
         authStateRepository = authStateRepository,
         authorizationValidator = authorizationValidator

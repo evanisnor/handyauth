@@ -6,6 +6,9 @@ import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.net.URLEncoder
 
+/**
+ * OAuth2 Configuration
+ */
 @Parcelize
 data class HandyAuthConfig(
     val clientId: String,
@@ -14,6 +17,7 @@ data class HandyAuthConfig(
     val tokenUrl: Uri,
     val scopes: List<String>,
 ) : Parcelable {
+
     constructor(
         clientId: String,
         redirectUrl: String,

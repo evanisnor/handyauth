@@ -1,4 +1,4 @@
-package com.evanisnor.handyauth.client.ui
+package com.evanisnor.handyauth.client.internal.ext
 
 import java.net.URLDecoder
 

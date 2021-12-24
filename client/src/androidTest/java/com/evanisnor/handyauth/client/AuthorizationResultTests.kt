@@ -58,12 +58,7 @@ class AuthorizationResultTests {
             server.waitForThisManyRequests(1)
 
             receivedResult.get().let { result ->
-                assertThat(result).isInstanceOf(HandyAuth.Result.Denied::class.java)
-                (result as HandyAuth.Result.Error).let { errorResult ->
-                    assertThat(errorResult.error).isEqualTo("access_denied")
-                    assertThat(errorResult.description).isEqualTo("Credentials are incorrect")
-                    assertThat(errorResult.uri).isEqualTo("https://fake.com/help")
-                }
+                assertThat(result).isSameInstanceAs(HandyAuth.Result.Error.Denied)
             }
         }
     }
@@ -84,12 +79,7 @@ class AuthorizationResultTests {
             server.waitForThisManyRequests(1)
 
             receivedResult.get().let { result ->
-                assertThat(result).isInstanceOf(HandyAuth.Result.Denied::class.java)
-                (result as HandyAuth.Result.Error).let { errorResult ->
-                    assertThat(errorResult.error).isNull()
-                    assertThat(errorResult.description).isNull()
-                    assertThat(errorResult.uri).isNull()
-                }
+                assertThat(result).isSameInstanceAs(HandyAuth.Result.Error.Denied)
             }
         }
     }
@@ -116,12 +106,7 @@ class AuthorizationResultTests {
             server.waitForThisManyRequests(1)
 
             receivedResult.get().let { result ->
-                assertThat(result).isInstanceOf(HandyAuth.Result.Denied::class.java)
-                (result as HandyAuth.Result.Error).let { errorResult ->
-                    assertThat(errorResult.error).isEqualTo("access_denied")
-                    assertThat(errorResult.description).isEqualTo("Credentials are incorrect")
-                    assertThat(errorResult.uri).isEqualTo("https://fake.com/help")
-                }
+                assertThat(result).isSameInstanceAs(HandyAuth.Result.Error.Denied)
             }
         }
     }
@@ -148,8 +133,8 @@ class AuthorizationResultTests {
             server.waitForThisManyRequests(1)
 
             receivedResult.get().let { result ->
-                assertThat(result).isInstanceOf(HandyAuth.Result.ParameterError::class.java)
-                (result as HandyAuth.Result.Error).let { errorResult ->
+                assertThat(result).isInstanceOf(HandyAuth.Result.Error.ParameterError::class.java)
+                (result as HandyAuth.Result.Error.ParameterError).let { errorResult ->
                     assertThat(errorResult.error).isEqualTo("invalid_request")
                     assertThat(errorResult.description).isEqualTo("Missing required parameter")
                     assertThat(errorResult.uri).isEqualTo("https://fake.com/help")
@@ -180,8 +165,8 @@ class AuthorizationResultTests {
             server.waitForThisManyRequests(1)
 
             receivedResult.get().let { result ->
-                assertThat(result).isInstanceOf(HandyAuth.Result.ParameterError::class.java)
-                (result as HandyAuth.Result.Error).let { errorResult ->
+                assertThat(result).isInstanceOf(HandyAuth.Result.Error.ParameterError::class.java)
+                (result as HandyAuth.Result.Error.ParameterError).let { errorResult ->
                     assertThat(errorResult.error).isEqualTo("unsupported_response_type")
                     assertThat(errorResult.description).isEqualTo("Unsupported method")
                     assertThat(errorResult.uri).isEqualTo("https://fake.com/help")
@@ -212,8 +197,8 @@ class AuthorizationResultTests {
             server.waitForThisManyRequests(1)
 
             receivedResult.get().let { result ->
-                assertThat(result).isInstanceOf(HandyAuth.Result.ParameterError::class.java)
-                (result as HandyAuth.Result.Error).let { errorResult ->
+                assertThat(result).isInstanceOf(HandyAuth.Result.Error.ParameterError::class.java)
+                (result as HandyAuth.Result.Error.ParameterError).let { errorResult ->
                     assertThat(errorResult.error).isEqualTo("invalid_client_secret")
                     assertThat(errorResult.description).isEqualTo("Client secret is invalid")
                     assertThat(errorResult.uri).isEqualTo("https://fake.com/help")
@@ -238,12 +223,7 @@ class AuthorizationResultTests {
             server.waitForThisManyRequests(1)
 
             receivedResult.get().let { result ->
-                assertThat(result).isInstanceOf(HandyAuth.Result.ServerError::class.java)
-                (result as HandyAuth.Result.Error).let { errorResult ->
-                    assertThat(errorResult.error).isEqualTo("Server is unreachable")
-                    assertThat(errorResult.description).isNull()
-                    assertThat(errorResult.uri).isNull()
-                }
+                assertThat(result).isEqualTo(HandyAuth.Result.Error.ServerError(500))
             }
         }
     }

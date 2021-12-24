@@ -9,8 +9,12 @@ import com.evanisnor.handyauth.client.databinding.HandyAuthActivityBinding
 import com.evanisnor.handyauth.client.internal.AuthResponseContract
 import com.evanisnor.handyauth.client.internal.model.AuthRequest
 import com.evanisnor.handyauth.client.internal.model.AuthResponse
-import com.evanisnor.handyauth.client.internal.webview.WebAuthorizationInterpreter
+import com.evanisnor.handyauth.client.internal.webview.WebAuthorizationHandler
 
+/**
+ * HandyAuthActivity is presented to the user during the authorization flow. A WebView is used to
+ * load the server's Authorization URL and handle the responses.
+ */
 class HandyAuthActivity : AppCompatActivity() {
 
     companion object {
@@ -32,7 +36,7 @@ class HandyAuthActivity : AppCompatActivity() {
 
         val authRequest: AuthRequest? = intent.getParcelableExtra(authorizationRequestExtra)
 
-        val webAuthorizationInterpreter = WebAuthorizationInterpreter(
+        val webAuthorizationInterpreter = WebAuthorizationHandler(
             redirectUrl = authRequest?.config?.redirectUrl ?: "",
             onAuthResponse = { response ->
                 setResult(Activity.RESULT_OK, Intent().apply {

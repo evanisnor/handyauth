@@ -3,6 +3,7 @@ plugins {
     id("kotlin-android")
     id("kotlin-kapt")
     id("kotlin-parcelize")
+    id("org.jetbrains.dokka") version "1.6.0"
     id("maven-publish")
 }
 
@@ -79,6 +80,9 @@ dependencies {
 
     // Debug
     debugImplementation("com.squareup.okhttp3:logging-interceptor:4.9.2")
+
+    // Documentation
+    dokkaHtmlPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:1.6.0")
 
     // Test
     testImplementation("androidx.test:core-ktx:1.4.0")

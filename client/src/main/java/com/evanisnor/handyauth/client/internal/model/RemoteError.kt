@@ -13,13 +13,15 @@ data class RemoteError(
 ) : Parcelable {
 
     fun toResultError(): HandyAuth.Result.Error = when (error) {
-        "access_denied" -> HandyAuth.Result.Denied(error, description, uri)
-        is String -> HandyAuth.Result.ParameterError(error, description, uri)
+        "access_denied" -> HandyAuth.Result.Error.Denied
+        is String -> HandyAuth.Result.Error.ParameterError(error, description, uri)
         else -> when (statusCode) {
-            401 -> HandyAuth.Result.Denied(error, description, uri)
-            403 -> HandyAuth.Result.Denied(error, description, uri)
-            in 500..599 -> HandyAuth.Result.ServerError
-            else -> HandyAuth.Result.UnknownError(error, description, uri)
+            is Int -> when (statusCode) {
+                401 -> HandyAuth.Result.Error.Denied
+                403 -> HandyAuth.Result.Error.Denied
+                else -> HandyAuth.Result.Error.ServerError(statusCode)
+            }
+            else -> HandyAuth.Result.Error.UnknownError
         }
     }
 

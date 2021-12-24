@@ -4,43 +4,95 @@ import android.app.Application
 import androidx.activity.ComponentActivity
 import com.evanisnor.handyauth.client.internal.HandyAuthComponent
 
+/**
+ * HandyAuth is an OAuth 2 client library for Android apps with a minimal API.
+ *
+ * Currently supported authorization flows:
+ *  - PKCE
+ */
 interface HandyAuth {
 
     companion object {
+
+        /**
+         * Create a new instance of HandyAuth for the provided config.
+         *
+         * @see [HandyAuthConfig]
+         */
         fun create(application: Application, config: HandyAuthConfig): HandyAuth =
             HandyAuthComponent.Builder()
-                .build(application, config).handyAuth
+                .build(application, config)
+                .handyAuth
     }
 
+    /**
+     * Is the user authorized with the server defined in [HandyAuthConfig]?
+     */
     val isAuthorized: Boolean
 
+    /**
+     * Begin the authorization flow and handle the [Result] in a callback. This will launch a web view
+     * that loads the server's authorization page, where the user can enter their credentials and
+     * grant access to your app.
+     */
     fun authorize(callingActivity: ComponentActivity, resultCallback: (Result) -> Unit)
 
+    /**
+     * Get the access token in the form of a [HandyAccessToken]. As long as the user [isAuthorized]
+     * (true), then the access token provided here will always be valid.
+     */
     suspend fun accessToken(): HandyAccessToken
 
+    /**
+     * Perform a logout, which will clear local authentication state for this instance. Afterward,
+     * [isAuthorized] will return false.
+     */
     suspend fun logout()
 
+    // region Result Types
+
+    /**
+     * Results are sealed types that are returned after executing the [authorize] flow.
+     */
     sealed interface Result {
-        sealed class Success : Result
 
-        sealed class Error(
-            val error: String?,
-            val description: String?,
-            val uri: String?
-        ) : Result
+        /**
+         * Authorization is successful. Calls to [accessToken] will now receive valid OAuth2 access tokens.
+         */
+        object Authorized : Result
 
-        object Authorized : Success()
-        object ServerError : Error("Server is unreachable", null, null)
+        /**
+         * An error occurred during the authorization flow.
+         */
+        sealed interface Error : Result {
 
-        class Denied(error: String?, description: String?, uri: String?) :
-            Error(error, description, uri)
+            /**
+             * Access has been denied by the server.
+             */
+            object Denied : Error
 
-        class ParameterError(error: String?, description: String?, uri: String?) :
-            Error(error, description, uri)
+            /**
+             * An error occurred on the server.
+             */
+            data class ServerError(val statusCode: Int) : Error
 
-        class UnknownError(error: String?, description: String?, uri: String?) :
-            Error(error, description, uri) {
-            constructor() : this("An unknown error has occurred", null, null)
+            /**
+             * The server returned an OAuth 2 error. Standard OAuth 2 authorization error
+             * parameters are provided.
+             */
+            data class ParameterError(
+                val error: String,
+                val description: String?,
+                val uri: String?
+            ) : Error
+
+            /**
+             * An unknown error has occurred.
+             */
+            object UnknownError : Error
         }
+
     }
+
+    // endregion
 }
