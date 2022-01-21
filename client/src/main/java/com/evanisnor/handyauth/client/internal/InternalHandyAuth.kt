@@ -11,7 +11,7 @@ import com.evanisnor.handyauth.client.internal.state.AuthStateRepository
 import com.evanisnor.handyauth.client.ui.HandyAuthActivity
 import kotlinx.coroutines.*
 
-internal class InternalHandyAuth constructor(
+internal class InternalHandyAuth @DelicateCoroutinesApi constructor(
     private val internalNetworkClient: InternalNetworkClient,
     private val authStateRepository: AuthStateRepository,
     private val authorizationValidator: AuthorizationValidator,

@@ -20,6 +20,7 @@ import com.evanisnor.handyauth.client.internal.state.StateModule
 import com.evanisnor.handyauth.client.internal.state.model.AuthStateJsonAdapter
 import com.evanisnor.handyauth.client.internal.time.InstantFactory
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.DelicateCoroutinesApi
 import okhttp3.OkHttpClient
 
 /**
@@ -119,6 +120,7 @@ internal class HandyAuthComponent(
      * An instance of HandyAuth, created with dependencies as provided by this [HandyAuthComponent]
      * instance.
      */
+    @DelicateCoroutinesApi
     internal val handyAuth: HandyAuth = InternalHandyAuth(
         internalNetworkClient = internalNetworkClient,
         authStateRepository = authStateRepository,

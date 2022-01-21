@@ -3,6 +3,7 @@ package com.evanisnor.handyauth.client
 import android.app.Application
 import androidx.activity.ComponentActivity
 import com.evanisnor.handyauth.client.internal.HandyAuthComponent
+import kotlinx.coroutines.DelicateCoroutinesApi
 
 /**
  * HandyAuth is an OAuth 2 client library for Android apps with a minimal API.
@@ -19,6 +20,7 @@ interface HandyAuth {
          *
          * @see [HandyAuthConfig]
          */
+        @DelicateCoroutinesApi
         fun create(application: Application, config: HandyAuthConfig): HandyAuth =
             HandyAuthComponent.Builder()
                 .build(application, config)
