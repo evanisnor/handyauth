@@ -1,17 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DesignSurface">
-    <option name="filePathToZoomLevelMap">
-      <map>
-        <entry key="client/src/main/res/layout/handy_auth_activity.xml" value="0.32653985507246375" />
-        <entry key="example-app/src/main/res/layout/authenticated_activity.xml" value="0.24113475177304963" />
-        <entry key="example-app/src/main/res/layout/login_error_activity.xml" value="0.23429584599797365" />
-        <entry key="example-app/src/main/res/layout/main_activity.xml" value="0.25835866261398177" />
-        <entry key="handyauth/client/src/main/res/layout/handy_auth_activity.xml" value="0.2625" />
-      </map>
-    </option>
-  </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">
