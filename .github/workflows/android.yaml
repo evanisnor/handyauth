@@ -31,7 +31,7 @@ jobs:
       - name: Checks
         run: ./gradlew check
       - name: Instrumentation Checks
-        uses: ReactiveCircus/android-emulator-runner@v2.21.0
+        uses: ReactiveCircus/android-emulator-runner@v2.23.0
         with:
           api-level: 31
           profile: pixel_3a
