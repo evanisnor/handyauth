@@ -34,7 +34,7 @@ jobs:
         uses: ReactiveCircus/android-emulator-runner@v2.23.0
         with:
           api-level: 31
-          profile: pixel_3a
+          profile: pixel_5
           arch: x86_64
           disable-animations: true
           script: ./gradlew connectedCheck
