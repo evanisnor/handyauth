@@ -22,7 +22,7 @@ class PersistenceTests {
     fun afterMemoryCleared_AccessTokenPersists() = runBlocking {
         val testInstantFactory = TestInstantFactory()
         val server = FakeAuthorizationServer()
-        val config = fakeAuthServerRobot.createFakeConfig(server)
+        val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
             config = config,
             testInstantFactory = testInstantFactory,
@@ -30,8 +30,9 @@ class PersistenceTests {
         ).use { component ->
             val handyAuth = component.handyAuth
             fakeAuthServerRobot.setupSuccessfulAuthorization(server, config)
+
             handyAuthRobot.performAuthorization(handyAuth)
-            server.waitForThisManyRequests(2)
+            server.waitForThisManyRequests(3)
 
             // Create a new instance
             handyAuthRobot.createTestHandyAuthComponent(
@@ -54,7 +55,7 @@ class PersistenceTests {
     fun afterMemoryCleared_WhenTokenExpired_AccessTokenRefreshes() = runBlocking {
         val testInstantFactory = TestInstantFactory()
         val server = FakeAuthorizationServer()
-        val config = fakeAuthServerRobot.createFakeConfig(server)
+        val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
             config = config,
             testInstantFactory = testInstantFactory,
@@ -63,7 +64,7 @@ class PersistenceTests {
             val handyAuth = component.handyAuth
             fakeAuthServerRobot.setupSuccessfulAuthorization(server, config)
             handyAuthRobot.performAuthorization(handyAuth)
-            server.waitForThisManyRequests(2)
+            server.waitForThisManyRequests(3)
 
             // Create a new instance
             handyAuthRobot.createTestHandyAuthComponent(

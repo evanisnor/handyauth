@@ -44,12 +44,6 @@ class FakeAuthorizationServer {
         )
     }
 
-    fun denyAuthorizationRequest() {
-        mockWebServer.enqueue(
-            MockResponse().setResponseCode(401)
-        )
-    }
-
     fun errorAuthorizationRequest(
         config: HandyAuthConfig,
         error: String,
@@ -68,9 +62,9 @@ class FakeAuthorizationServer {
         )
     }
 
-    fun returnServerError() {
+    fun returnServerError(statusCode: Int) {
         mockWebServer.enqueue(
-            MockResponse().setResponseCode(500)
+            MockResponse().setResponseCode(statusCode)
         )
     }
 

@@ -7,20 +7,43 @@ import androidx.test.core.app.launchActivity
 import com.evanisnor.handyauth.client.HandyAuth
 import com.evanisnor.handyauth.client.HandyAuthConfig
 import com.evanisnor.handyauth.client.fakes.*
+import com.evanisnor.handyauth.client.fakeserver.FakeAuthorizationServer
 import com.evanisnor.handyauth.client.internal.HandyAuthComponent
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 class HandyAuthRobot {
+
+    companion object {
+        /**
+         * Protocol scheme for the androidTest application, as registered in AndroidManifest.xml
+         *
+         * Used here to send a VIEW intent with the OAuth Redirect to the test app when performing
+         * the authorization flow.
+         */
+        private const val appScheme: String = "test.app"
+        const val redirectUrl: String = "$appScheme://redirect"
+    }
+
+    // region HandyAuthConfig
 
     private fun createFakeConfig(): HandyAuthConfig =
         HandyAuthConfig(
             clientId = "test-id",
-            redirectUrl = "my.app://redirect",
+            redirectUrl = redirectUrl,
             authorizationUrl = "https://fake.com/authorization",
             tokenUrl = "https://fake.com/token",
             scopes = listOf("test_scope_a", "test_scope_b")
         )
+
+    fun createFakeConfig(server: FakeAuthorizationServer): HandyAuthConfig =
+        HandyAuthConfig(
+            clientId = "test-id",
+            redirectUrl = redirectUrl,
+            authorizationUrl = "${server.mockWebServerUrl}authorization",
+            tokenUrl = "${server.mockWebServerUrl}token",
+            scopes = listOf("test_scope_a", "test_scope_b")
+        )
+
+    // endregion
 
     internal fun createTestHandyAuthComponent(
         config: HandyAuthConfig = createFakeConfig(),
@@ -43,21 +66,18 @@ class HandyAuthRobot {
         return TestHandyAuthComponent(handyAuthComponent)
     }
 
-
-    fun performAuthorization(
+    internal fun performAuthorization(
         handyAuth: HandyAuth,
         resultCallback: (HandyAuth.Result) -> Unit = {}
     ) {
-        val latch = CountDownLatch(1)
         launchActivity<TestLoginActivity>()
             .moveToState(Lifecycle.State.CREATED)
             .onActivity { activity ->
-                handyAuth.authorize(activity) { result ->
-                    resultCallback(result)
-                    latch.countDown()
-                }
+
+                // Start the authorization flow - this will launch a browser
+                handyAuth.authorize(activity, resultCallback)
             }
             .moveToState(Lifecycle.State.RESUMED)
-        latch.await(10, TimeUnit.SECONDS)
     }
+
 }

@@ -19,15 +19,16 @@ class LogoutTests {
     @Test
     fun afterLogout_WhereInstanceIsSame_UserIsNotAuthenticated() = runBlocking {
         val server = FakeAuthorizationServer()
-        val config = fakeAuthServerRobot.createFakeConfig(server)
+        val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
             config = config,
             testAuthorizationValidator = TestAuthorizationValidator()
         ).use { component ->
             val handyAuth = component.handyAuth
             fakeAuthServerRobot.setupSuccessfulAuthorization(server, config)
+
             handyAuthRobot.performAuthorization(handyAuth)
-            server.waitForThisManyRequests(2)
+            server.waitForThisManyRequests(3)
             handyAuth.logout()
 
             Truth.assertThat(handyAuth.isAuthorized).isFalse()
@@ -38,15 +39,16 @@ class LogoutTests {
     @Test
     fun afterLogout_WhereInstanceIsNew_UserIsNotAuthenticated(): Unit = runBlocking {
         val server = FakeAuthorizationServer()
-        val config = fakeAuthServerRobot.createFakeConfig(server)
+        val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
             config = config,
             testAuthorizationValidator = TestAuthorizationValidator()
         ).use { component ->
             val handyAuth = component.handyAuth
             fakeAuthServerRobot.setupSuccessfulAuthorization(server, config)
+
             handyAuthRobot.performAuthorization(handyAuth)
-            server.waitForThisManyRequests(2)
+            server.waitForThisManyRequests(3)
             handyAuth.logout()
 
             // Create a new instance

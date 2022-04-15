@@ -4,47 +4,35 @@ import com.evanisnor.handyauth.client.HandyAuthConfig
 
 class FakeAuthServerRobot {
 
-    fun createFakeConfig(server: FakeAuthorizationServer): HandyAuthConfig =
-        HandyAuthConfig(
-            clientId = "test-id",
-            redirectUrl = "my.app://redirect",
-            authorizationUrl = "${server.mockWebServerUrl}authorization",
-            tokenUrl = "${server.mockWebServerUrl}token",
-            scopes = listOf("test_scope_a", "test_scope_b")
-        )
-
     fun setupSuccessfulAuthorization(
         server: FakeAuthorizationServer,
-        config: HandyAuthConfig
+        config: HandyAuthConfig,
+        expectedCode: String = "test-code",
+        expectedState: String = "test-state"
     ) {
-        // test server enqueue Location redirect with code & state
+        // Authorization Requests are OK
         server.acceptAuthorizationRequest(config)
-        // test server enqueue exchange response
+
+        // Exchange Requests are OK
         server.acceptExchangeRequest(
             response = createExchangeResponse()
         )
     }
 
-    fun setupFailedAuthorization(server: FakeAuthorizationServer) {
-        // test server return 401
-        server.denyAuthorizationRequest()
-    }
-
     fun setupFailedAuthorization(
         server: FakeAuthorizationServer,
         config: HandyAuthConfig,
-        error: String,
-        errorDescription: String,
-        errorUri: String
+        expectedError: String = "test-error",
+        expectedErrorDescription: String = "Expected error description goes here",
+        expectedErrorUri: String = "https://test.app/test-error",
     ) {
         // test server return an error
-        server.errorAuthorizationRequest(config, error, errorDescription, errorUri)
-    }
-
-    fun setupServerError(
-        server: FakeAuthorizationServer
-    ) {
-        server.returnServerError()
+        server.errorAuthorizationRequest(
+            config,
+            expectedError,
+            expectedErrorDescription,
+            expectedErrorUri
+        )
     }
 
     fun setupFreshAccessToken(server: FakeAuthorizationServer) {

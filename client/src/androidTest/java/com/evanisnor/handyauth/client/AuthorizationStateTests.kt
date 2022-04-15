@@ -5,7 +5,7 @@ import com.evanisnor.handyauth.client.fakes.TestAuthorizationValidator
 import com.evanisnor.handyauth.client.fakeserver.FakeAuthServerRobot
 import com.evanisnor.handyauth.client.fakeserver.FakeAuthorizationServer
 import com.evanisnor.handyauth.client.robot.HandyAuthRobot
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -19,33 +19,18 @@ class AuthorizationStateTests {
     @Test
     fun afterAuthorizationSuccess_UserIsAuthorized() = runBlocking {
         val server = FakeAuthorizationServer()
-        val config = fakeAuthServerRobot.createFakeConfig(server)
+        val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
             config = config,
             testAuthorizationValidator = TestAuthorizationValidator()
         ).use { component ->
             val handyAuth: HandyAuth = component.handyAuth
             fakeAuthServerRobot.setupSuccessfulAuthorization(server, config)
+
             handyAuthRobot.performAuthorization(handyAuth)
-            server.waitForThisManyRequests(2)
+            server.waitForThisManyRequests(3)
 
-            Truth.assertThat(handyAuth.isAuthorized).isTrue()
-        }
-    }
-
-    @Test
-    fun afterAuthorizationError_UserIsNotAuthorized() = runBlocking {
-        val server = FakeAuthorizationServer()
-        val config = fakeAuthServerRobot.createFakeConfig(server)
-        handyAuthRobot.createTestHandyAuthComponent(
-            config = config
-        ).use { component ->
-            val handyAuth = component.handyAuth
-            fakeAuthServerRobot.setupFailedAuthorization(server)
-            handyAuthRobot.performAuthorization(handyAuth)
-            server.waitForThisManyRequests(1)
-
-            Truth.assertThat(handyAuth.isAuthorized).isFalse()
+            assertThat(handyAuth.isAuthorized).isTrue()
         }
     }
 
@@ -53,7 +38,7 @@ class AuthorizationStateTests {
     fun afterInvalidAuthorization_UserIsNotAuthorized() = runBlocking {
         val authorizationValidator = TestAuthorizationValidator()
         val server = FakeAuthorizationServer()
-        val config = fakeAuthServerRobot.createFakeConfig(server)
+        val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
             config = config,
             testAuthorizationValidator = authorizationValidator
@@ -62,27 +47,29 @@ class AuthorizationStateTests {
 
             val handyAuth: HandyAuth = component.handyAuth
             fakeAuthServerRobot.setupSuccessfulAuthorization(server, config)
-            handyAuthRobot.performAuthorization(handyAuth)
-            server.waitForThisManyRequests(1)
 
-            Truth.assertThat(handyAuth.isAuthorized).isFalse()
+            handyAuthRobot.performAuthorization(handyAuth)
+            server.waitForThisManyRequests(2)
+
+            assertThat(handyAuth.isAuthorized).isFalse()
         }
     }
 
     @Test
     fun afterAuthorizationSuccess_AccessTokenIsAvailable() = runBlocking {
         val server = FakeAuthorizationServer()
-        val config = fakeAuthServerRobot.createFakeConfig(server)
+        val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
             config = config,
             testAuthorizationValidator = TestAuthorizationValidator()
         ).use { component ->
             val handyAuth: HandyAuth = component.handyAuth
             fakeAuthServerRobot.setupSuccessfulAuthorization(server, config)
-            handyAuthRobot.performAuthorization(handyAuth)
-            server.waitForThisManyRequests(2)
 
-            Truth.assertThat(handyAuth.accessToken()).isEqualTo(
+            handyAuthRobot.performAuthorization(handyAuth)
+            server.waitForThisManyRequests(3)
+
+            assertThat(handyAuth.accessToken()).isEqualTo(
                 HandyAccessToken(
                     token = "exchange-response-access-token",
                     tokenType = "Fake"

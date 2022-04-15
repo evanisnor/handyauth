@@ -19,8 +19,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.main_activity)
 
         if (!handyAuth.isAuthorized) {
-            handyAuth.authorize(this) { result ->
-                when (result) {
+            handyAuth.authorize(this@MainActivity) {
+                when (it) {
                     is HandyAuth.Result.Authorized -> {
                         onAuthenticated()
                     }

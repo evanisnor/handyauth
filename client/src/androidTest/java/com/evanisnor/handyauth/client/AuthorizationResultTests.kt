@@ -20,7 +20,7 @@ class AuthorizationResultTests {
     @Test
     fun afterAuthorizationSuccess_ResultIsSuccess() = runBlocking {
         val server = FakeAuthorizationServer()
-        val config = fakeAuthServerRobot.createFakeConfig(server)
+        val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
             config = config,
             testAuthorizationValidator = TestAuthorizationValidator()
@@ -29,8 +29,9 @@ class AuthorizationResultTests {
 
             val handyAuth: HandyAuth = component.handyAuth
             fakeAuthServerRobot.setupSuccessfulAuthorization(server, config)
+
             handyAuthRobot.performAuthorization(handyAuth, receivedResult::set)
-            server.waitForThisManyRequests(2)
+            server.waitForThisManyRequests(3)
 
             assertThat(receivedResult.get()).isEqualTo(HandyAuth.Result.Authorized)
         }
@@ -39,7 +40,7 @@ class AuthorizationResultTests {
     @Test
     fun afterAuthorizationFailed_WhenLoginIsDenied_ResultIsDenied() = runBlocking {
         val server = FakeAuthorizationServer()
-        val config = fakeAuthServerRobot.createFakeConfig(server)
+        val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
             config = config,
             testAuthorizationValidator = TestAuthorizationValidator()
@@ -50,33 +51,13 @@ class AuthorizationResultTests {
             fakeAuthServerRobot.setupFailedAuthorization(
                 server = server,
                 config = config,
-                error = "access_denied",
-                errorDescription = "Credentials are incorrect",
-                errorUri = "https://fake.com/help"
+                expectedError = "access_denied",
+                expectedErrorDescription = "Credentials are incorrect",
+                expectedErrorUri = "https://fake.com/help"
             )
+
             handyAuthRobot.performAuthorization(handyAuth, receivedResult::set)
-            server.waitForThisManyRequests(1)
-
-            receivedResult.get().let { result ->
-                assertThat(result).isSameInstanceAs(HandyAuth.Result.Error.Denied)
-            }
-        }
-    }
-
-    @Test
-    fun afterAuthorizationFailed_WhenServerReturnsForbidden_ResultIsDenied() = runBlocking {
-        val server = FakeAuthorizationServer()
-        val config = fakeAuthServerRobot.createFakeConfig(server)
-        handyAuthRobot.createTestHandyAuthComponent(
-            config = config,
-            testAuthorizationValidator = TestAuthorizationValidator()
-        ).use { component ->
-            val receivedResult = AtomicReference<HandyAuth.Result>()
-
-            val handyAuth: HandyAuth = component.handyAuth
-            fakeAuthServerRobot.setupFailedAuthorization(server)
-            handyAuthRobot.performAuthorization(handyAuth, receivedResult::set)
-            server.waitForThisManyRequests(1)
+            server.waitForThisManyRequests(2)
 
             receivedResult.get().let { result ->
                 assertThat(result).isSameInstanceAs(HandyAuth.Result.Error.Denied)
@@ -87,7 +68,7 @@ class AuthorizationResultTests {
     @Test
     fun afterAuthorizationFailed_WhenLoginIsForbidden_ResultIsDenied() = runBlocking {
         val server = FakeAuthorizationServer()
-        val config = fakeAuthServerRobot.createFakeConfig(server)
+        val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
             config = config,
             testAuthorizationValidator = TestAuthorizationValidator()
@@ -98,12 +79,13 @@ class AuthorizationResultTests {
             fakeAuthServerRobot.setupFailedAuthorization(
                 server = server,
                 config = config,
-                error = "access_denied",
-                errorDescription = "Credentials are incorrect",
-                errorUri = "https://fake.com/help"
+                expectedError = "access_denied",
+                expectedErrorDescription = "Credentials are incorrect",
+                expectedErrorUri = "https://fake.com/help"
             )
+
             handyAuthRobot.performAuthorization(handyAuth, receivedResult::set)
-            server.waitForThisManyRequests(1)
+            server.waitForThisManyRequests(2)
 
             receivedResult.get().let { result ->
                 assertThat(result).isSameInstanceAs(HandyAuth.Result.Error.Denied)
@@ -114,7 +96,7 @@ class AuthorizationResultTests {
     @Test
     fun afterAuthorizationFailed_WhenRequestIsInvalid_ResultIsParameterError() = runBlocking {
         val server = FakeAuthorizationServer()
-        val config = fakeAuthServerRobot.createFakeConfig(server)
+        val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
             config = config,
             testAuthorizationValidator = TestAuthorizationValidator()
@@ -125,12 +107,13 @@ class AuthorizationResultTests {
             fakeAuthServerRobot.setupFailedAuthorization(
                 server = server,
                 config = config,
-                error = "invalid_request",
-                errorDescription = "Missing required parameter",
-                errorUri = "https://fake.com/help"
+                expectedError = "invalid_request",
+                expectedErrorDescription = "Missing required parameter",
+                expectedErrorUri = "https://fake.com/help"
             )
+
             handyAuthRobot.performAuthorization(handyAuth, receivedResult::set)
-            server.waitForThisManyRequests(1)
+            server.waitForThisManyRequests(2)
 
             receivedResult.get().let { result ->
                 assertThat(result).isInstanceOf(HandyAuth.Result.Error.ParameterError::class.java)
@@ -146,7 +129,7 @@ class AuthorizationResultTests {
     @Test
     fun afterAuthorizationFailed_WhenAuthMethodUnsupported_ResultIsParameterError() = runBlocking {
         val server = FakeAuthorizationServer()
-        val config = fakeAuthServerRobot.createFakeConfig(server)
+        val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
             config = config,
             testAuthorizationValidator = TestAuthorizationValidator()
@@ -157,12 +140,13 @@ class AuthorizationResultTests {
             fakeAuthServerRobot.setupFailedAuthorization(
                 server = server,
                 config = config,
-                error = "unsupported_response_type",
-                errorDescription = "Unsupported method",
-                errorUri = "https://fake.com/help"
+                expectedError = "unsupported_response_type",
+                expectedErrorDescription = "Unsupported method",
+                expectedErrorUri = "https://fake.com/help"
             )
+
             handyAuthRobot.performAuthorization(handyAuth, receivedResult::set)
-            server.waitForThisManyRequests(1)
+            server.waitForThisManyRequests(2)
 
             receivedResult.get().let { result ->
                 assertThat(result).isInstanceOf(HandyAuth.Result.Error.ParameterError::class.java)
@@ -178,7 +162,7 @@ class AuthorizationResultTests {
     @Test
     fun afterAuthorizationFailed_WhenInvalidClientSecret_ResultIsParameterError() = runBlocking {
         val server = FakeAuthorizationServer()
-        val config = fakeAuthServerRobot.createFakeConfig(server)
+        val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
             config = config,
             testAuthorizationValidator = TestAuthorizationValidator()
@@ -189,12 +173,13 @@ class AuthorizationResultTests {
             fakeAuthServerRobot.setupFailedAuthorization(
                 server = server,
                 config = config,
-                error = "invalid_client_secret",
-                errorDescription = "Client secret is invalid",
-                errorUri = "https://fake.com/help"
+                expectedError = "invalid_client_secret",
+                expectedErrorDescription = "Client secret is invalid",
+                expectedErrorUri = "https://fake.com/help"
             )
+
             handyAuthRobot.performAuthorization(handyAuth, receivedResult::set)
-            server.waitForThisManyRequests(1)
+            server.waitForThisManyRequests(2)
 
             receivedResult.get().let { result ->
                 assertThat(result).isInstanceOf(HandyAuth.Result.Error.ParameterError::class.java)
@@ -203,27 +188,6 @@ class AuthorizationResultTests {
                     assertThat(errorResult.description).isEqualTo("Client secret is invalid")
                     assertThat(errorResult.uri).isEqualTo("https://fake.com/help")
                 }
-            }
-        }
-    }
-
-    @Test
-    fun afterAuthorizationFailed_WhenServerIsBroken_ResultIsServerError() = runBlocking {
-        val server = FakeAuthorizationServer()
-        val config = fakeAuthServerRobot.createFakeConfig(server)
-        handyAuthRobot.createTestHandyAuthComponent(
-            config = config,
-            testAuthorizationValidator = TestAuthorizationValidator()
-        ).use { component ->
-            val receivedResult = AtomicReference<HandyAuth.Result>()
-
-            val handyAuth: HandyAuth = component.handyAuth
-            fakeAuthServerRobot.setupServerError(server)
-            handyAuthRobot.performAuthorization(handyAuth, receivedResult::set)
-            server.waitForThisManyRequests(1)
-
-            receivedResult.get().let { result ->
-                assertThat(result).isEqualTo(HandyAuth.Result.Error.ServerError(500))
             }
         }
     }

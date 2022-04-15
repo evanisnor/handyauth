@@ -21,7 +21,7 @@ class RefreshTests {
     @Test
     fun afterTokenRefresh_WhenTokenIsNotExpired_CurrentAccessTokenIsAvailable() = runBlocking {
         val server = FakeAuthorizationServer()
-        val config = fakeAuthServerRobot.createFakeConfig(server)
+        val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
             config = config,
             testInstantFactory = TestInstantFactory(),
@@ -30,8 +30,9 @@ class RefreshTests {
             val handyAuth = component.handyAuth
             fakeAuthServerRobot.setupSuccessfulAuthorization(server, config)
             fakeAuthServerRobot.setupFreshAccessToken(server)
+
             handyAuthRobot.performAuthorization(handyAuth)
-            server.waitForThisManyRequests(2)
+            server.waitForThisManyRequests(3)
 
             assertThat(handyAuth.accessToken()).isEqualTo(
                 HandyAccessToken(
@@ -46,7 +47,7 @@ class RefreshTests {
     fun afterTokenRefresh_WhenTokenIsExpired_FreshAccessTokenIsAvailable() = runBlocking {
         val testInstantFactory = TestInstantFactory()
         val server = FakeAuthorizationServer()
-        val config = fakeAuthServerRobot.createFakeConfig(server)
+        val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
             config = config,
             testInstantFactory = testInstantFactory,
@@ -55,8 +56,9 @@ class RefreshTests {
             val handyAuth = component.handyAuth
             fakeAuthServerRobot.setupSuccessfulAuthorization(server, config)
             fakeAuthServerRobot.setupFreshAccessToken(server)
+
             handyAuthRobot.performAuthorization(handyAuth)
-            server.waitForThisManyRequests(2)
+            server.waitForThisManyRequests(3)
             // Current time to compare to exchange-response token expiry - After, expired
             testInstantFactory.now = Instant.ofEpochSecond(2000L)
 
@@ -73,7 +75,7 @@ class RefreshTests {
     fun afterTokenRefresh_WhenTokenIsExpired_NewRefreshTokenIsAvailable() = runBlocking {
         val testInstantFactory = TestInstantFactory()
         val server = FakeAuthorizationServer()
-        val config = fakeAuthServerRobot.createFakeConfig(server)
+        val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
             config = config,
             testInstantFactory = testInstantFactory,
@@ -82,8 +84,9 @@ class RefreshTests {
             val handyAuth = component.handyAuth
             fakeAuthServerRobot.setupSuccessfulAuthorization(server, config)
             fakeAuthServerRobot.setupNewRefreshToken(server)
+
             handyAuthRobot.performAuthorization(handyAuth)
-            server.waitForThisManyRequests(2)
+            server.waitForThisManyRequests(3)
             // Current time to compare to exchange-response token expiry - After, expired
             testInstantFactory.now = Instant.ofEpochSecond(2000L)
 

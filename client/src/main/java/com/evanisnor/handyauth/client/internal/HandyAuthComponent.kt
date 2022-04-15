@@ -7,8 +7,8 @@ import com.evanisnor.handyauth.client.HandyAuthConfig
 import com.evanisnor.handyauth.client.internal.model.ExchangeResponseJsonAdapter
 import com.evanisnor.handyauth.client.internal.model.RefreshResponseJsonAdapter
 import com.evanisnor.handyauth.client.internal.network.DefaultNetworkModule
-import com.evanisnor.handyauth.client.internal.network.InternalNetworkClient
 import com.evanisnor.handyauth.client.internal.network.NetworkModule
+import com.evanisnor.handyauth.client.internal.network.TokenNetworkClient
 import com.evanisnor.handyauth.client.internal.secure.AuthorizationValidator
 import com.evanisnor.handyauth.client.internal.secure.CodeGenerator
 import com.evanisnor.handyauth.client.internal.secure.DefaultSecureModule
@@ -104,7 +104,7 @@ internal class HandyAuthComponent(
         networkModule.exchangeResponseJsonAdapter(moshi)
     private val refreshResponseJsonAdapter: RefreshResponseJsonAdapter =
         networkModule.refreshResponseJsonAdapter(moshi)
-    private val internalNetworkClient: InternalNetworkClient = networkModule.internalNetworkClient(
+    private val tokenNetworkClient: TokenNetworkClient = networkModule.tokenNetworkClient(
         config = config,
         codeGenerator = codeGenerator,
         okHttpClient = okHttpClient,
@@ -122,7 +122,7 @@ internal class HandyAuthComponent(
      */
     @DelicateCoroutinesApi
     internal val handyAuth: HandyAuth = InternalHandyAuth(
-        internalNetworkClient = internalNetworkClient,
+        tokenNetworkClient = tokenNetworkClient,
         authStateRepository = authStateRepository,
         authorizationValidator = authorizationValidator
     )

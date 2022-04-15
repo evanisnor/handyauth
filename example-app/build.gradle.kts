@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
-
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -16,6 +14,7 @@ android {
         targetSdk = 31
         versionCode = 1
         versionName = "1.0"
+        manifestPlaceholders["redirectUriScheme"] = "com.evanisnor.freshwaves"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

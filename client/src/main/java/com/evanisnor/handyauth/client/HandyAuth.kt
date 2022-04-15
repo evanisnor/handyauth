@@ -33,11 +33,14 @@ interface HandyAuth {
     val isAuthorized: Boolean
 
     /**
-     * Begin the authorization flow and handle the [Result] in a callback. This will launch a web view
+     * Begin the authorization flow and handle the [Result]. This will launch a browser
      * that loads the server's authorization page, where the user can enter their credentials and
      * grant access to your app.
      */
-    fun authorize(callingActivity: ComponentActivity, resultCallback: (Result) -> Unit)
+    fun authorize(
+        callingActivity: ComponentActivity,
+        resultCallback: (Result) -> Unit
+    )
 
     /**
      * Get the access token in the form of a [HandyAccessToken]. As long as the user [isAuthorized]
@@ -77,6 +80,11 @@ interface HandyAuth {
              * An error occurred on the server.
              */
             data class ServerError(val statusCode: Int) : Error
+
+            /**
+             * A local error has occurred.
+             */
+            data class LocalError(val throwable: Throwable) : Error
 
             /**
              * The server returned an OAuth 2 error. Standard OAuth 2 authorization error

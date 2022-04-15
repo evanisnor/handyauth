@@ -25,7 +25,7 @@ data class AuthRequest(
     }
 
     @IgnoredOnParcel
-    val authorizationUrl: Uri =
+    val authorizationUri: Uri =
         Uri.parse(
             "${config.authorizationUrl}?" +
                     "client_id=${config.clientId}&" +

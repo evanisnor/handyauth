@@ -15,11 +15,11 @@ object ExampleHandyAuthModule {
 
     @Provides
     fun handyAuthConfig(): HandyAuthConfig = HandyAuthConfig(
-        clientId = "",
-        redirectUrl = "",
-        authorizationUrl = "",
-        tokenUrl = "",
-        scopes = listOf()
+        clientId = "3db837a49d3c4df0a277b0adaa748d87",
+        redirectUrl = "com.evanisnor.freshwaves://authorize",
+        authorizationUrl = "https://accounts.spotify.com/authorize",
+        tokenUrl = "https://accounts.spotify.com/api/token",
+        scopes = listOf("user-top-read", "user-read-private", "user-read-email")
     )
 
     @DelicateCoroutinesApi

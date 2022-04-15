@@ -1,4 +1,4 @@
-package com.evanisnor.handyauth.client.internal.webview
+package com.evanisnor.handyauth.client.internal.browser
 
 import android.annotation.SuppressLint
 import android.webkit.WebResourceRequest
@@ -6,9 +6,9 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.evanisnor.handyauth.client.internal.ext.isAuthorizationRedirect
+import com.evanisnor.handyauth.client.internal.ext.urlDecode
 import com.evanisnor.handyauth.client.internal.model.AuthResponse
 import com.evanisnor.handyauth.client.internal.model.RemoteError
-import com.evanisnor.handyauth.client.internal.ext.urlDecode
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 /**
@@ -54,7 +54,7 @@ internal class WebAuthorizationHandler(
         }
     }
 
-    private fun onAuthorizationResponse(url: String?) {
+    fun onAuthorizationResponse(url: String?) {
         url?.replace(redirectUrl, "https://ok")
             ?.toHttpUrlOrNull()
             ?.let {
@@ -92,4 +92,5 @@ internal class WebAuthorizationHandler(
             )
         )
     }
+
 }

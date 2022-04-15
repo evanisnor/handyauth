@@ -3,12 +3,12 @@ package com.evanisnor.handyauth.client.internal.network
 import com.evanisnor.handyauth.client.HandyAuthConfig
 import com.evanisnor.handyauth.client.internal.model.*
 import com.evanisnor.handyauth.client.internal.secure.CodeGenerator
+import com.squareup.moshi.JsonAdapter
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.Response
 
-class InternalNetworkClient(
+class TokenNetworkClient(
     private val config: HandyAuthConfig,
     private val codeGenerator: CodeGenerator,
     private val client: OkHttpClient,
@@ -32,7 +32,7 @@ class InternalNetworkClient(
     suspend fun exchangeCodeForTokens(
         authorizationCode: String,
         codeVerifier: String
-    ): ExchangeResponse? {
+    ): ExchangeResponse {
         val exchangeRequest = Request.Builder()
             .url(config.tokenUrl.toString())
             .post(
@@ -46,14 +46,11 @@ class InternalNetworkClient(
             )
             .build()
 
-        return send(exchangeRequest)?.body?.let { body ->
-            runCatching {
-                exchangeResponseJsonAdapter.fromJson(body.source())
-            }.getOrNull()
-        }
+        return client.newCall(exchangeRequest).send()
+            .parseBody(adapter = exchangeResponseJsonAdapter)
     }
 
-    suspend fun refresh(refreshToken: String): RefreshResponse? {
+    suspend fun refresh(refreshToken: String): RefreshResponse {
         val refreshRequest = Request.Builder()
             .url(config.tokenUrl.toString())
             .post(
@@ -65,13 +62,23 @@ class InternalNetworkClient(
             )
             .build()
 
-        return send(refreshRequest)?.body?.let { body ->
-            runCatching {
-                refreshResponseJsonAdapter.fromJson(body.source())
-            }.getOrNull()
-        }
+        return client.newCall(refreshRequest).send().parseBody(adapter = refreshResponseJsonAdapter)
     }
 
-    private suspend fun send(request: Request): Response? = client.newCall(request).send().response
+    /**
+     * Parse the response body with the specified JsonAdapter
+     */
+    private fun <T> CallResult.parseBody(adapter: JsonAdapter<T>) = when (this) {
+        is CallResult.Response -> {
+            runCatching {
+                response.body!!.let { body ->
+                    adapter.fromJson(body.source())!!
+                }
+            }.getOrThrow()
+        }
+        is CallResult.Error -> {
+            throw Exception(error)
+        }
+    }
 
 }

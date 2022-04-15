@@ -17,13 +17,13 @@ internal interface NetworkModule {
     fun refreshResponseJsonAdapter(moshi: Moshi): RefreshResponseJsonAdapter =
         RefreshResponseJsonAdapter(moshi)
 
-    fun internalNetworkClient(
+    fun tokenNetworkClient(
         config: HandyAuthConfig,
         codeGenerator: CodeGenerator,
         okHttpClient: OkHttpClient,
         exchangeResponseJsonAdapter: ExchangeResponseJsonAdapter,
         refreshResponseJsonAdapter: RefreshResponseJsonAdapter
-    ): InternalNetworkClient = InternalNetworkClient(
+    ): TokenNetworkClient = TokenNetworkClient(
         config = config,
         codeGenerator = codeGenerator,
         client = okHttpClient,
