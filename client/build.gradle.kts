@@ -46,12 +46,6 @@ android {
     lint {
         isWarningsAsErrors = true
     }
-
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
-    }
 }
 
 afterEvaluate {
