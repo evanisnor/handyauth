@@ -6,9 +6,7 @@ class FakeAuthServerRobot {
 
     fun setupSuccessfulAuthorization(
         server: FakeAuthorizationServer,
-        config: HandyAuthConfig,
-        expectedCode: String = "test-code",
-        expectedState: String = "test-state"
+        config: HandyAuthConfig
     ) {
         // Authorization Requests are OK
         server.acceptAuthorizationRequest(config)
