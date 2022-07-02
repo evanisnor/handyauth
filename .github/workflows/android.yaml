@@ -40,5 +40,7 @@ jobs:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
           disable-animations: true
-          script: ./gradlew connectedCheck
+          script: |
+            adb shell 'echo "chrome --disable-fre --no-default-browser-check --no-first-run" > /data/local/tmp/chrome-command-line'
+            ./gradlew connectedCheck
 
