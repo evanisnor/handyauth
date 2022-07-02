@@ -33,7 +33,7 @@ jobs:
       - name: Instrumentation Checks
         uses: ReactiveCircus/android-emulator-runner@v2.24.0
         with:
-          api-level: 31
+          api-level: 29
           disable-animations: true
           script: ./gradlew connectedCheck
 
