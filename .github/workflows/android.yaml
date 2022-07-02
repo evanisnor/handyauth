@@ -31,10 +31,10 @@ jobs:
       - name: Checks
         run: ./gradlew check
       - name: Instrumentation Checks
-        uses: ReactiveCircus/android-emulator-runner@v2.23.0
+        uses: ReactiveCircus/android-emulator-runner@v2.24.0
         with:
           api-level: 31
-          profile: pixel_5
+          profile: Pixel 5
           arch: x86_64
           disable-animations: true
           script: ./gradlew connectedCheck
