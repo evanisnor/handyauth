@@ -63,6 +63,7 @@ class HandyAuthActivity : AppCompatActivity() {
                 setResult(Activity.RESULT_OK, Intent().apply {
                     putExtra(authorizationResponseExtra, response)
                 })
+                finish()
             }
         )
     }

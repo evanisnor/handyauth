@@ -35,7 +35,7 @@ internal class WebAuthorizationHandler(
             ): Boolean {
                 if (request.isAuthorizationRedirect(redirectUrl)) {
                     onAuthorizationResponse(request?.url?.toString())
-                    return false
+                    return true
                 }
 
                 return super.shouldOverrideUrlLoading(view, request)
