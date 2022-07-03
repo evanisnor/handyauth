@@ -7,7 +7,7 @@ import com.evanisnor.handyauth.client.fakeserver.FakeAuthServerRobot
 import com.evanisnor.handyauth.client.fakeserver.FakeAuthorizationServer
 import com.evanisnor.handyauth.client.robot.HandyAuthRobot
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.time.Instant
@@ -19,7 +19,7 @@ class RefreshTests {
     private val handyAuthRobot = HandyAuthRobot()
 
     @Test
-    fun afterTokenRefresh_WhenTokenIsNotExpired_CurrentAccessTokenIsAvailable() = runBlocking {
+    fun afterTokenRefresh_WhenTokenIsNotExpired_CurrentAccessTokenIsAvailable() = runTest {
         val server = FakeAuthorizationServer()
         val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
@@ -44,7 +44,7 @@ class RefreshTests {
     }
 
     @Test
-    fun afterTokenRefresh_WhenTokenIsExpired_FreshAccessTokenIsAvailable() = runBlocking {
+    fun afterTokenRefresh_WhenTokenIsExpired_FreshAccessTokenIsAvailable() = runTest {
         val testInstantFactory = TestInstantFactory()
         val server = FakeAuthorizationServer()
         val config = handyAuthRobot.createFakeConfig(server)
@@ -72,7 +72,7 @@ class RefreshTests {
     }
 
     @Test
-    fun afterTokenRefresh_WhenTokenIsExpired_NewRefreshTokenIsAvailable() = runBlocking {
+    fun afterTokenRefresh_WhenTokenIsExpired_NewRefreshTokenIsAvailable() = runTest {
         val testInstantFactory = TestInstantFactory()
         val server = FakeAuthorizationServer()
         val config = handyAuthRobot.createFakeConfig(server)

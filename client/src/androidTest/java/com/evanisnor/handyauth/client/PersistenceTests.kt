@@ -7,7 +7,7 @@ import com.evanisnor.handyauth.client.fakeserver.FakeAuthServerRobot
 import com.evanisnor.handyauth.client.fakeserver.FakeAuthorizationServer
 import com.evanisnor.handyauth.client.robot.HandyAuthRobot
 import com.google.common.truth.Truth
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.time.Instant
@@ -19,7 +19,7 @@ class PersistenceTests {
     private val handyAuthRobot = HandyAuthRobot()
 
     @Test
-    fun afterMemoryCleared_AccessTokenPersists() = runBlocking {
+    fun afterMemoryCleared_AccessTokenPersists() = runTest {
         val testInstantFactory = TestInstantFactory()
         val server = FakeAuthorizationServer()
         val config = handyAuthRobot.createFakeConfig(server)
@@ -52,7 +52,7 @@ class PersistenceTests {
     }
 
     @Test
-    fun afterMemoryCleared_WhenTokenExpired_AccessTokenRefreshes() = runBlocking {
+    fun afterMemoryCleared_WhenTokenExpired_AccessTokenRefreshes() = runTest {
         val testInstantFactory = TestInstantFactory()
         val server = FakeAuthorizationServer()
         val config = handyAuthRobot.createFakeConfig(server)

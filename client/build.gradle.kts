@@ -59,11 +59,11 @@ afterEvaluate {
 
 dependencies {
     // Runtime
-    implementation("androidx.appcompat:appcompat:1.4.1")
-    implementation("androidx.activity:activity-ktx:1.4.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.1")
+    implementation("androidx.appcompat:appcompat:1.4.2")
+    implementation("androidx.activity:activity-ktx:1.5.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.0")
     implementation("androidx.browser:browser:1.4.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.1")
     implementation("com.squareup.okio:okio:3.0.0")
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
     implementation("com.squareup.moshi:moshi:1.13.0")

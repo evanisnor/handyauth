@@ -6,7 +6,7 @@ import com.evanisnor.handyauth.client.fakeserver.FakeAuthServerRobot
 import com.evanisnor.handyauth.client.fakeserver.FakeAuthorizationServer
 import com.evanisnor.handyauth.client.robot.HandyAuthRobot
 import com.google.common.truth.Truth
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -17,7 +17,7 @@ class LogoutTests {
     private val handyAuthRobot = HandyAuthRobot()
 
     @Test
-    fun afterLogout_WhereInstanceIsSame_UserIsNotAuthenticated() = runBlocking {
+    fun afterLogout_WhereInstanceIsSame_UserIsNotAuthenticated() = runTest {
         val server = FakeAuthorizationServer()
         val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
@@ -37,7 +37,7 @@ class LogoutTests {
     }
 
     @Test
-    fun afterLogout_WhereInstanceIsNew_UserIsNotAuthenticated(): Unit = runBlocking {
+    fun afterLogout_WhereInstanceIsNew_UserIsNotAuthenticated(): Unit = runTest {
         val server = FakeAuthorizationServer()
         val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(

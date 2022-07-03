@@ -6,7 +6,7 @@ import com.evanisnor.handyauth.client.fakeserver.FakeAuthServerRobot
 import com.evanisnor.handyauth.client.fakeserver.FakeAuthorizationServer
 import com.evanisnor.handyauth.client.robot.HandyAuthRobot
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -17,7 +17,7 @@ class AuthorizationStateTests {
     private val handyAuthRobot = HandyAuthRobot()
 
     @Test
-    fun afterAuthorizationSuccess_UserIsAuthorized() = runBlocking {
+    fun afterAuthorizationSuccess_UserIsAuthorized() = runTest {
         val server = FakeAuthorizationServer()
         val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
@@ -35,7 +35,7 @@ class AuthorizationStateTests {
     }
 
     @Test
-    fun afterInvalidAuthorization_UserIsNotAuthorized() = runBlocking {
+    fun afterInvalidAuthorization_UserIsNotAuthorized() = runTest {
         val authorizationValidator = TestAuthorizationValidator()
         val server = FakeAuthorizationServer()
         val config = handyAuthRobot.createFakeConfig(server)
@@ -56,7 +56,7 @@ class AuthorizationStateTests {
     }
 
     @Test
-    fun afterAuthorizationSuccess_AccessTokenIsAvailable() = runBlocking {
+    fun afterAuthorizationSuccess_AccessTokenIsAvailable() = runTest {
         val server = FakeAuthorizationServer()
         val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(

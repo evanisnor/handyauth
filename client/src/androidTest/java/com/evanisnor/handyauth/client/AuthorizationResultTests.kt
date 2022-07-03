@@ -6,7 +6,7 @@ import com.evanisnor.handyauth.client.fakeserver.FakeAuthServerRobot
 import com.evanisnor.handyauth.client.fakeserver.FakeAuthorizationServer
 import com.evanisnor.handyauth.client.robot.HandyAuthRobot
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.atomic.AtomicReference
@@ -18,7 +18,7 @@ class AuthorizationResultTests {
     private val handyAuthRobot = HandyAuthRobot()
 
     @Test
-    fun afterAuthorizationSuccess_ResultIsSuccess() = runBlocking {
+    fun afterAuthorizationSuccess_ResultIsSuccess() = runTest {
         val server = FakeAuthorizationServer()
         val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
@@ -38,7 +38,7 @@ class AuthorizationResultTests {
     }
 
     @Test
-    fun afterAuthorizationFailed_WhenLoginIsDenied_ResultIsDenied() = runBlocking {
+    fun afterAuthorizationFailed_WhenLoginIsDenied_ResultIsDenied() = runTest {
         val server = FakeAuthorizationServer()
         val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
@@ -66,7 +66,7 @@ class AuthorizationResultTests {
     }
 
     @Test
-    fun afterAuthorizationFailed_WhenLoginIsForbidden_ResultIsDenied() = runBlocking {
+    fun afterAuthorizationFailed_WhenLoginIsForbidden_ResultIsDenied() = runTest {
         val server = FakeAuthorizationServer()
         val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
@@ -94,7 +94,7 @@ class AuthorizationResultTests {
     }
 
     @Test
-    fun afterAuthorizationFailed_WhenRequestIsInvalid_ResultIsParameterError() = runBlocking {
+    fun afterAuthorizationFailed_WhenRequestIsInvalid_ResultIsParameterError() = runTest {
         val server = FakeAuthorizationServer()
         val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
@@ -127,7 +127,7 @@ class AuthorizationResultTests {
     }
 
     @Test
-    fun afterAuthorizationFailed_WhenAuthMethodUnsupported_ResultIsParameterError() = runBlocking {
+    fun afterAuthorizationFailed_WhenAuthMethodUnsupported_ResultIsParameterError() = runTest {
         val server = FakeAuthorizationServer()
         val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(
@@ -160,7 +160,7 @@ class AuthorizationResultTests {
     }
 
     @Test
-    fun afterAuthorizationFailed_WhenInvalidClientSecret_ResultIsParameterError() = runBlocking {
+    fun afterAuthorizationFailed_WhenInvalidClientSecret_ResultIsParameterError() = runTest {
         val server = FakeAuthorizationServer()
         val config = handyAuthRobot.createFakeConfig(server)
         handyAuthRobot.createTestHandyAuthComponent(

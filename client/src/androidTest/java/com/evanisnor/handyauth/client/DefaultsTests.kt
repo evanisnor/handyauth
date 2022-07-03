@@ -4,7 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.evanisnor.handyauth.client.internal.InternalHandyAuth
 import com.evanisnor.handyauth.client.robot.HandyAuthRobot
 import com.google.common.truth.Truth
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -29,7 +29,7 @@ class DefaultsTests {
     }
 
     @Test
-    fun beforeAuthorization_AccessTokenIsBlank() = runBlocking {
+    fun beforeAuthorization_AccessTokenIsBlank() = runTest {
         handyAuthRobot.createTestHandyAuthComponent().use { component ->
             val handyAuth = component.handyAuth
             Truth.assertThat(handyAuth.accessToken()).isEqualTo(HandyAccessToken())

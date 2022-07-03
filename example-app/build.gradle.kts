@@ -43,12 +43,12 @@ android {
 dependencies {
     implementation(project(":client"))
 
-    implementation("androidx.core:core-ktx:1.7.0")
-    implementation("androidx.appcompat:appcompat:1.4.1")
-    implementation("androidx.fragment:fragment-ktx:1.4.1")
-    implementation("com.google.android.material:material:1.5.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.3")
+    implementation("androidx.core:core-ktx:1.8.0")
+    implementation("androidx.appcompat:appcompat:1.4.2")
+    implementation("androidx.fragment:fragment-ktx:1.5.0")
+    implementation("com.google.android.material:material:1.6.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
-    implementation("com.google.dagger:hilt-android:2.40.5")
-    kapt("com.google.dagger:hilt-android-compiler:2.40.5")
+    implementation("com.google.dagger:hilt-android:2.41")
+    kapt("com.google.dagger:hilt-android-compiler:2.41")
 }
