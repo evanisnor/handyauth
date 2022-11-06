@@ -1,7 +1,7 @@
 plugins {
     id("com.android.library")
     id("kotlin-android")
-    id("kotlin-kapt")
+    id("com.google.devtools.ksp").version("1.7.20-1.0.8")
     id("kotlin-parcelize")
     id("org.jetbrains.dokka") version "1.6.0"
     id("maven-publish")
@@ -67,7 +67,7 @@ dependencies {
     implementation("com.squareup.okio:okio:3.0.0")
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.6")
     implementation("com.squareup.moshi:moshi:1.13.0")
-    kapt("com.squareup.moshi:moshi-kotlin-codegen:1.13.0")
+    ksp("com.squareup.moshi:moshi-kotlin-codegen:1.14.0")
 
     // Debug
     debugImplementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.6")
@@ -87,6 +87,6 @@ dependencies {
     androidTestImplementation("com.google.truth:truth:1.1.3")
     androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
-    kaptAndroidTest("com.squareup.moshi:moshi-kotlin-codegen:1.13.0")
+    kspAndroidTest("com.squareup.moshi:moshi-kotlin-codegen:1.14.0")
 
 }
