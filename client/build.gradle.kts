@@ -65,12 +65,12 @@ dependencies {
     implementation("androidx.browser:browser:1.4.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")
     implementation("com.squareup.okio:okio:3.0.0")
-    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.6")
     implementation("com.squareup.moshi:moshi:1.13.0")
     kapt("com.squareup.moshi:moshi-kotlin-codegen:1.13.0")
 
     // Debug
-    debugImplementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
+    debugImplementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.6")
 
     // Documentation
     dokkaHtmlPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:1.6.0")
@@ -85,7 +85,7 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit-ktx:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
     androidTestImplementation("com.google.truth:truth:1.1.3")
-    androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
+    androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
     kaptAndroidTest("com.squareup.moshi:moshi-kotlin-codegen:1.13.0")
 
