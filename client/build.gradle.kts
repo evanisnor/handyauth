@@ -29,6 +29,7 @@ android {
     viewBinding = true
   }
 
+<<<<<<< Updated upstream
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
@@ -41,6 +42,27 @@ android {
       "-Xopt-in=kotlinx.coroutines.ObsoleteCoroutinesApi",
     )
   }
+=======
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    kotlinOptions {
+        languageVersion = "1.5"
+        jvmTarget = "11"
+        freeCompilerArgs = listOf(
+            "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-Xopt-in=kotlinx.coroutines.ObsoleteCoroutinesApi"
+        )
+    }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
+>>>>>>> Stashed changes
 }
 
 afterEvaluate {
@@ -80,6 +102,7 @@ dependencies {
   testImplementation("junit:junit:4.13.2")
   testImplementation("com.google.truth:truth:1.1.3")
 
+<<<<<<< Updated upstream
   androidTestImplementation("androidx.test:core-ktx:1.4.0")
   androidTestImplementation("androidx.test.ext:junit-ktx:1.1.3")
   androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
@@ -87,4 +110,13 @@ dependencies {
   androidTestImplementation("com.squareup.okhttp3:mockwebserver:5.0.0-alpha.6")
   androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
   kspAndroidTest("com.squareup.moshi:moshi-kotlin-codegen:1.14.0")
+=======
+    androidTestImplementation("androidx.test:core-ktx:1.4.0")
+    androidTestImplementation("androidx.test.ext:junit-ktx:1.1.3")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+    androidTestImplementation("com.google.truth:truth:1.1.3")
+    androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.9.2")
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2")
+    kaptAndroidTest("com.squareup.moshi:moshi-kotlin-codegen:1.12.0")
+>>>>>>> Stashed changes
 }
