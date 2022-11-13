@@ -9,10 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
  */
 class HandyAuthReceiverActivity : AppCompatActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        HandyAuthActivity.startWithResponseUri(this, intent.data ?: Uri.EMPTY)
-        finish()
-    }
-
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    HandyAuthActivity.startWithResponseUri(this, intent.data ?: Uri.EMPTY)
+    finish()
+  }
 }

@@ -5,8 +5,7 @@ import java.time.Instant
 
 class TestInstantFactory : InstantFactory {
 
-    var now: Instant = Instant.ofEpochMilli(0)
+  var now: Instant = Instant.ofEpochMilli(0)
 
-    override fun now(): Instant = now
-
+  override fun now(): Instant = now
 }

@@ -4,10 +4,9 @@ import com.evanisnor.handyauth.client.internal.state.model.AuthState
 
 interface AuthStateCache {
 
-    fun save(authState: AuthState)
+  fun save(authState: AuthState)
 
-    fun read(): AuthState
+  fun read(): AuthState
 
-    fun clear()
-
+  fun clear()
 }

@@ -31,100 +31,98 @@ import okhttp3.OkHttpClient
  * usage of third-party dependencies
  */
 internal class HandyAuthComponent(
-    private val context: Context,
-    private val config: HandyAuthConfig,
-    private val stateModule: StateModule,
-    private val secureModule: SecureModule,
-    private val networkModule: NetworkModule
+  private val context: Context,
+  private val config: HandyAuthConfig,
+  private val stateModule: StateModule,
+  private val secureModule: SecureModule,
+  private val networkModule: NetworkModule,
 ) {
 
-    /**
-     * Build the HandyAuth dependency graph. Custom dependency modules may be provided for testing
-     * purposes.
-     */
-    internal class Builder {
+  /**
+   * Build the HandyAuth dependency graph. Custom dependency modules may be provided for testing
+   * purposes.
+   */
+  internal class Builder {
 
-        private var stateModule: StateModule = DefaultStateModule()
-        private var secureModule: SecureModule = DefaultSecureModule()
-        private val networkModule: NetworkModule = DefaultNetworkModule()
+    private var stateModule: StateModule = DefaultStateModule()
+    private var secureModule: SecureModule = DefaultSecureModule()
+    private val networkModule: NetworkModule = DefaultNetworkModule()
 
-        fun stateModule(stateModule: StateModule): Builder {
-            this.stateModule = stateModule
-            return this
-        }
-
-        fun secureModule(secureModule: SecureModule): Builder {
-            this.secureModule = secureModule
-            return this
-        }
-
-        fun build(application: Application, config: HandyAuthConfig): HandyAuthComponent =
-            HandyAuthComponent(
-                context = application,
-                config = config,
-                stateModule = stateModule,
-                secureModule = secureModule,
-                networkModule = networkModule
-            )
-
+    fun stateModule(stateModule: StateModule): Builder {
+      this.stateModule = stateModule
+      return this
     }
 
-    // region Graph Composition
+    fun secureModule(secureModule: SecureModule): Builder {
+      this.secureModule = secureModule
+      return this
+    }
 
-    // region State Module
-
-    private val moshi: Moshi = stateModule.moshi()
-    private val instantFactory: InstantFactory = stateModule.instantFactory()
-    private val authStateJsonAdapter: AuthStateJsonAdapter = stateModule.authStateJsonAdapter(moshi)
-
-    internal val persistentCache: AuthStateCache =
-        stateModule.persistentCache(context, config, authStateJsonAdapter)
-
-    internal val memoryCache: AuthStateCache = stateModule.memoryCache(persistentCache)
-
-    private val authStateRepository = AuthStateRepository(
-        instantFactory = instantFactory,
-        cache = memoryCache
-    )
-
-    // endregion
-
-    // region Secure Module
-
-    private val authorizationValidator: AuthorizationValidator =
-        secureModule.authorizationValidator()
-    private val codeGenerator: CodeGenerator = secureModule.codeGenerator()
-
-    // endregion
-
-    // region Network Module
-
-    private val okHttpClient: OkHttpClient = networkModule.okHttpClient()
-    private val exchangeResponseJsonAdapter: ExchangeResponseJsonAdapter =
-        networkModule.exchangeResponseJsonAdapter(moshi)
-    private val refreshResponseJsonAdapter: RefreshResponseJsonAdapter =
-        networkModule.refreshResponseJsonAdapter(moshi)
-    private val tokenNetworkClient: TokenNetworkClient = networkModule.tokenNetworkClient(
+    fun build(application: Application, config: HandyAuthConfig): HandyAuthComponent =
+      HandyAuthComponent(
+        context = application,
         config = config,
-        codeGenerator = codeGenerator,
-        okHttpClient = okHttpClient,
-        exchangeResponseJsonAdapter = exchangeResponseJsonAdapter,
-        refreshResponseJsonAdapter = refreshResponseJsonAdapter
-    )
+        stateModule = stateModule,
+        secureModule = secureModule,
+        networkModule = networkModule,
+      )
+  }
 
-    // endregion
+  // region Graph Composition
 
-    // endregion
+  // region State Module
 
-    /**
-     * An instance of HandyAuth, created with dependencies as provided by this [HandyAuthComponent]
-     * instance.
-     */
-    @DelicateCoroutinesApi
-    internal val handyAuth: HandyAuth = InternalHandyAuth(
-        tokenNetworkClient = tokenNetworkClient,
-        authStateRepository = authStateRepository,
-        authorizationValidator = authorizationValidator
-    )
+  private val moshi: Moshi = stateModule.moshi()
+  private val instantFactory: InstantFactory = stateModule.instantFactory()
+  private val authStateJsonAdapter: AuthStateJsonAdapter = stateModule.authStateJsonAdapter(moshi)
 
+  internal val persistentCache: AuthStateCache =
+    stateModule.persistentCache(context, config, authStateJsonAdapter)
+
+  internal val memoryCache: AuthStateCache = stateModule.memoryCache(persistentCache)
+
+  private val authStateRepository = AuthStateRepository(
+    instantFactory = instantFactory,
+    cache = memoryCache,
+  )
+
+  // endregion
+
+  // region Secure Module
+
+  private val authorizationValidator: AuthorizationValidator =
+    secureModule.authorizationValidator()
+  private val codeGenerator: CodeGenerator = secureModule.codeGenerator()
+
+  // endregion
+
+  // region Network Module
+
+  private val okHttpClient: OkHttpClient = networkModule.okHttpClient()
+  private val exchangeResponseJsonAdapter: ExchangeResponseJsonAdapter =
+    networkModule.exchangeResponseJsonAdapter(moshi)
+  private val refreshResponseJsonAdapter: RefreshResponseJsonAdapter =
+    networkModule.refreshResponseJsonAdapter(moshi)
+  private val tokenNetworkClient: TokenNetworkClient = networkModule.tokenNetworkClient(
+    config = config,
+    codeGenerator = codeGenerator,
+    okHttpClient = okHttpClient,
+    exchangeResponseJsonAdapter = exchangeResponseJsonAdapter,
+    refreshResponseJsonAdapter = refreshResponseJsonAdapter,
+  )
+
+  // endregion
+
+  // endregion
+
+  /**
+   * An instance of HandyAuth, created with dependencies as provided by this [HandyAuthComponent]
+   * instance.
+   */
+  @DelicateCoroutinesApi
+  internal val handyAuth: HandyAuth = InternalHandyAuth(
+    tokenNetworkClient = tokenNetworkClient,
+    authStateRepository = authStateRepository,
+    authorizationValidator = authorizationValidator,
+  )
 }

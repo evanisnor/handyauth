@@ -13,21 +13,20 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 @InstallIn(SingletonComponent::class)
 object ExampleHandyAuthModule {
 
-    @Provides
-    fun handyAuthConfig(): HandyAuthConfig = HandyAuthConfig(
-        clientId = "",
-        redirectUrl = "",
-        authorizationUrl = "",
-        tokenUrl = "",
-        scopes = listOf()
+  @Provides
+  fun handyAuthConfig(): HandyAuthConfig = HandyAuthConfig(
+    clientId = "",
+    redirectUrl = "",
+    authorizationUrl = "",
+    tokenUrl = "",
+    scopes = listOf(),
+  )
+
+  @DelicateCoroutinesApi
+  @Provides
+  fun handyAuth(application: Application, handyAuthConfig: HandyAuthConfig): HandyAuth =
+    HandyAuth.create(
+      application = application,
+      config = handyAuthConfig,
     )
-
-    @DelicateCoroutinesApi
-    @Provides
-    fun handyAuth(application: Application, handyAuthConfig: HandyAuthConfig): HandyAuth =
-        HandyAuth.create(
-            application = application,
-            config = handyAuthConfig
-        )
-
 }

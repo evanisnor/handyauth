@@ -11,27 +11,27 @@ import java.net.URLEncoder
  */
 @Parcelize
 data class HandyAuthConfig(
-    val clientId: String,
-    val redirectUrl: String,
-    val authorizationUrl: Uri,
-    val tokenUrl: Uri,
-    val scopes: List<String>,
+  val clientId: String,
+  val redirectUrl: String,
+  val authorizationUrl: Uri,
+  val tokenUrl: Uri,
+  val scopes: List<String>,
 ) : Parcelable {
 
-    constructor(
-        clientId: String,
-        redirectUrl: String,
-        authorizationUrl: String,
-        tokenUrl: String,
-        scopes: List<String>
-    ) : this(
-        clientId,
-        redirectUrl,
-        Uri.parse(authorizationUrl),
-        Uri.parse(tokenUrl),
-        scopes
-    )
+  constructor(
+    clientId: String,
+    redirectUrl: String,
+    authorizationUrl: String,
+    tokenUrl: String,
+    scopes: List<String>,
+  ) : this(
+    clientId,
+    redirectUrl,
+    Uri.parse(authorizationUrl),
+    Uri.parse(tokenUrl),
+    scopes,
+  )
 
-    @IgnoredOnParcel
-    internal val encodedRedirectUrl: String = URLEncoder.encode(redirectUrl, "utf-8")
+  @IgnoredOnParcel
+  internal val encodedRedirectUrl: String = URLEncoder.encode(redirectUrl, "utf-8")
 }

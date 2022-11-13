@@ -13,21 +13,21 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class AuthenticatedActivity : AppCompatActivity() {
 
-    @Inject
-    lateinit var handyAuth: HandyAuth
+  @Inject
+  lateinit var handyAuth: HandyAuth
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
 
-        AuthenticatedActivityBinding.inflate(layoutInflater).apply {
-            logout.setOnClickListener {
-                lifecycleScope.launch {
-                    handyAuth.logout()
-                    startActivity(Intent(baseContext, MainActivity::class.java))
-                }
-            }
-
-            setContentView(root)
+    AuthenticatedActivityBinding.inflate(layoutInflater).apply {
+      logout.setOnClickListener {
+        lifecycleScope.launch {
+          handyAuth.logout()
+          startActivity(Intent(baseContext, MainActivity::class.java))
         }
+      }
+
+      setContentView(root)
     }
+  }
 }

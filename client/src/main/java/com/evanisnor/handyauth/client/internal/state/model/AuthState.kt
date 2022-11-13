@@ -7,22 +7,25 @@ import java.time.Instant
 
 @JsonClass(generateAdapter = true)
 data class AuthState(
-    val isAuthorized: Boolean = false,
-    val refreshToken: String? = null,
-    @EpochMilli val tokenExpiry: Instant? = null,
-    val accessToken: String? = null,
-    val accessTokenType: String? = null
+  val isAuthorized: Boolean = false,
+  val refreshToken: String? = null,
+  @EpochMilli val tokenExpiry: Instant? = null,
+  val accessToken: String? = null,
+  val accessTokenType: String? = null,
 ) {
 
-    fun isExpired(now: Instant) = tokenExpiry != null && now.isAfter(tokenExpiry)
+  fun isExpired(now: Instant) = tokenExpiry != null && now.isAfter(tokenExpiry)
 
-    fun asMutableAuthState(): MutableAuthState = MutableAuthState(
-        isAuthorized, refreshToken, tokenExpiry, accessToken, accessTokenType
-    )
+  fun asMutableAuthState(): MutableAuthState = MutableAuthState(
+    isAuthorized,
+    refreshToken,
+    tokenExpiry,
+    accessToken,
+    accessTokenType,
+  )
 
-    fun asAccessToken(): HandyAccessToken = HandyAccessToken(
-        token = accessToken ?: "",
-        tokenType = accessTokenType ?: ""
-    )
-
+  fun asAccessToken(): HandyAccessToken = HandyAccessToken(
+    token = accessToken ?: "",
+    tokenType = accessTokenType ?: "",
+  )
 }

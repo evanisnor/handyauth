@@ -6,9 +6,8 @@ import com.evanisnor.handyauth.client.internal.secure.AuthorizationValidator
 
 class TestAuthorizationValidator : AuthorizationValidator {
 
-    var isValid: Boolean = true
+  var isValid: Boolean = true
 
-    override fun isValid(authRequest: AuthRequest, authResponse: AuthResponse?): Boolean =
-        authResponse != null && isValid
-
+  override fun isValid(authRequest: AuthRequest, authResponse: AuthResponse?): Boolean =
+    authResponse != null && isValid
 }

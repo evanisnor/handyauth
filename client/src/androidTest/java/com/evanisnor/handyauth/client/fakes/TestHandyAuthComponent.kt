@@ -4,14 +4,14 @@ import com.evanisnor.handyauth.client.internal.HandyAuthComponent
 import java.io.Closeable
 
 internal class TestHandyAuthComponent(
-    private val handyAuthComponent: HandyAuthComponent
+  private val handyAuthComponent: HandyAuthComponent,
 ) : Closeable {
 
-    val handyAuth = handyAuthComponent.handyAuth
+  val handyAuth = handyAuthComponent.handyAuth
 
-    val memoryCache = handyAuthComponent.memoryCache
+  val memoryCache = handyAuthComponent.memoryCache
 
-    override fun close() {
-        handyAuthComponent.persistentCache.clear()
-    }
+  override fun close() {
+    handyAuthComponent.persistentCache.clear()
+  }
 }

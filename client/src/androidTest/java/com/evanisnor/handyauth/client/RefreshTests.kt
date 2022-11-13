@@ -15,89 +15,89 @@ import java.time.Instant
 @RunWith(AndroidJUnit4::class)
 class RefreshTests {
 
-    private val fakeAuthServerRobot = FakeAuthServerRobot()
-    private val handyAuthRobot = HandyAuthRobot()
+  private val fakeAuthServerRobot = FakeAuthServerRobot()
+  private val handyAuthRobot = HandyAuthRobot()
 
-    @Test
-    fun afterTokenRefresh_WhenTokenIsNotExpired_CurrentAccessTokenIsAvailable() = runTest {
-        val server = FakeAuthorizationServer()
-        val config = handyAuthRobot.createFakeConfig(server)
-        handyAuthRobot.createTestHandyAuthComponent(
-            config = config,
-            testInstantFactory = TestInstantFactory(),
-            testAuthorizationValidator = TestAuthorizationValidator()
-        ).use { component ->
-            val handyAuth = component.handyAuth
-            fakeAuthServerRobot.setupSuccessfulAuthorization(server, config)
-            fakeAuthServerRobot.setupFreshAccessToken(server)
+  @Test
+  fun afterTokenRefresh_WhenTokenIsNotExpired_CurrentAccessTokenIsAvailable() = runTest {
+    val server = FakeAuthorizationServer()
+    val config = handyAuthRobot.createFakeConfig(server)
+    handyAuthRobot.createTestHandyAuthComponent(
+      config = config,
+      testInstantFactory = TestInstantFactory(),
+      testAuthorizationValidator = TestAuthorizationValidator(),
+    ).use { component ->
+      val handyAuth = component.handyAuth
+      fakeAuthServerRobot.setupSuccessfulAuthorization(server, config)
+      fakeAuthServerRobot.setupFreshAccessToken(server)
 
-            handyAuthRobot.performAuthorization(handyAuth)
-            server.waitForThisManyRequests(3)
+      handyAuthRobot.performAuthorization(handyAuth)
+      server.waitForThisManyRequests(3)
 
-            assertThat(handyAuth.accessToken()).isEqualTo(
-                HandyAccessToken(
-                    token = "exchange-response-access-token",
-                    tokenType = "Fake"
-                )
-            )
-        }
+      assertThat(handyAuth.accessToken()).isEqualTo(
+        HandyAccessToken(
+          token = "exchange-response-access-token",
+          tokenType = "Fake",
+        ),
+      )
     }
+  }
 
-    @Test
-    fun afterTokenRefresh_WhenTokenIsExpired_FreshAccessTokenIsAvailable() = runTest {
-        val testInstantFactory = TestInstantFactory()
-        val server = FakeAuthorizationServer()
-        val config = handyAuthRobot.createFakeConfig(server)
-        handyAuthRobot.createTestHandyAuthComponent(
-            config = config,
-            testInstantFactory = testInstantFactory,
-            testAuthorizationValidator = TestAuthorizationValidator()
-        ).use { component ->
-            val handyAuth = component.handyAuth
-            fakeAuthServerRobot.setupSuccessfulAuthorization(server, config)
-            fakeAuthServerRobot.setupFreshAccessToken(server)
+  @Test
+  fun afterTokenRefresh_WhenTokenIsExpired_FreshAccessTokenIsAvailable() = runTest {
+    val testInstantFactory = TestInstantFactory()
+    val server = FakeAuthorizationServer()
+    val config = handyAuthRobot.createFakeConfig(server)
+    handyAuthRobot.createTestHandyAuthComponent(
+      config = config,
+      testInstantFactory = testInstantFactory,
+      testAuthorizationValidator = TestAuthorizationValidator(),
+    ).use { component ->
+      val handyAuth = component.handyAuth
+      fakeAuthServerRobot.setupSuccessfulAuthorization(server, config)
+      fakeAuthServerRobot.setupFreshAccessToken(server)
 
-            handyAuthRobot.performAuthorization(handyAuth)
-            server.waitForThisManyRequests(3)
-            // Current time to compare to exchange-response token expiry - After, expired
-            testInstantFactory.now = Instant.ofEpochSecond(2000L)
+      handyAuthRobot.performAuthorization(handyAuth)
+      server.waitForThisManyRequests(3)
+      // Current time to compare to exchange-response token expiry - After, expired
+      testInstantFactory.now = Instant.ofEpochSecond(2000L)
 
-            assertThat(handyAuth.accessToken()).isEqualTo(
-                HandyAccessToken(
-                    token = "refresh-response-access-token",
-                    tokenType = "Fake"
-                )
-            )
-        }
+      assertThat(handyAuth.accessToken()).isEqualTo(
+        HandyAccessToken(
+          token = "refresh-response-access-token",
+          tokenType = "Fake",
+        ),
+      )
     }
+  }
 
-    @Test
-    fun afterTokenRefresh_WhenTokenIsExpired_NewRefreshTokenIsAvailable() = runTest {
-        val testInstantFactory = TestInstantFactory()
-        val server = FakeAuthorizationServer()
-        val config = handyAuthRobot.createFakeConfig(server)
-        handyAuthRobot.createTestHandyAuthComponent(
-            config = config,
-            testInstantFactory = testInstantFactory,
-            testAuthorizationValidator = TestAuthorizationValidator()
-        ).use { component ->
-            val handyAuth = component.handyAuth
-            fakeAuthServerRobot.setupSuccessfulAuthorization(server, config)
-            fakeAuthServerRobot.setupNewRefreshToken(server)
+  @Test
+  fun afterTokenRefresh_WhenTokenIsExpired_NewRefreshTokenIsAvailable() = runTest {
+    val testInstantFactory = TestInstantFactory()
+    val server = FakeAuthorizationServer()
+    val config = handyAuthRobot.createFakeConfig(server)
+    handyAuthRobot.createTestHandyAuthComponent(
+      config = config,
+      testInstantFactory = testInstantFactory,
+      testAuthorizationValidator = TestAuthorizationValidator(),
+    ).use { component ->
+      val handyAuth = component.handyAuth
+      fakeAuthServerRobot.setupSuccessfulAuthorization(server, config)
+      fakeAuthServerRobot.setupNewRefreshToken(server)
 
-            handyAuthRobot.performAuthorization(handyAuth)
-            server.waitForThisManyRequests(3)
-            // Current time to compare to exchange-response token expiry - After, expired
-            testInstantFactory.now = Instant.ofEpochSecond(2000L)
+      handyAuthRobot.performAuthorization(handyAuth)
+      server.waitForThisManyRequests(3)
+      // Current time to compare to exchange-response token expiry - After, expired
+      testInstantFactory.now = Instant.ofEpochSecond(2000L)
 
-            assertThat(handyAuth.accessToken()).isEqualTo(
-                HandyAccessToken(
-                    token = "updated-refresh-token-access",
-                    tokenType = "Fake"
-                )
-            )
-            assertThat(component.memoryCache.read().refreshToken)
-                .isEqualTo("new-refresh-token")
-        }
+      assertThat(handyAuth.accessToken()).isEqualTo(
+        HandyAccessToken(
+          token = "updated-refresh-token-access",
+          tokenType = "Fake",
+        ),
+      )
+      assertThat(component.memoryCache.read().refreshToken)
+        .isEqualTo("new-refresh-token")
     }
+  }
 }

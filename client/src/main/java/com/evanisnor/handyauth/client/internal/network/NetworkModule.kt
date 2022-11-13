@@ -9,26 +9,25 @@ import okhttp3.OkHttpClient
 
 internal interface NetworkModule {
 
-    fun okHttpClient(): OkHttpClient = OkHttpClient.Builder().build()
+  fun okHttpClient(): OkHttpClient = OkHttpClient.Builder().build()
 
-    fun exchangeResponseJsonAdapter(moshi: Moshi): ExchangeResponseJsonAdapter =
-        ExchangeResponseJsonAdapter(moshi)
+  fun exchangeResponseJsonAdapter(moshi: Moshi): ExchangeResponseJsonAdapter =
+    ExchangeResponseJsonAdapter(moshi)
 
-    fun refreshResponseJsonAdapter(moshi: Moshi): RefreshResponseJsonAdapter =
-        RefreshResponseJsonAdapter(moshi)
+  fun refreshResponseJsonAdapter(moshi: Moshi): RefreshResponseJsonAdapter =
+    RefreshResponseJsonAdapter(moshi)
 
-    fun tokenNetworkClient(
-        config: HandyAuthConfig,
-        codeGenerator: CodeGenerator,
-        okHttpClient: OkHttpClient,
-        exchangeResponseJsonAdapter: ExchangeResponseJsonAdapter,
-        refreshResponseJsonAdapter: RefreshResponseJsonAdapter
-    ): TokenNetworkClient = TokenNetworkClient(
-        config = config,
-        codeGenerator = codeGenerator,
-        client = okHttpClient,
-        exchangeResponseJsonAdapter = exchangeResponseJsonAdapter,
-        refreshResponseJsonAdapter = refreshResponseJsonAdapter
-    )
-
+  fun tokenNetworkClient(
+    config: HandyAuthConfig,
+    codeGenerator: CodeGenerator,
+    okHttpClient: OkHttpClient,
+    exchangeResponseJsonAdapter: ExchangeResponseJsonAdapter,
+    refreshResponseJsonAdapter: RefreshResponseJsonAdapter,
+  ): TokenNetworkClient = TokenNetworkClient(
+    config = config,
+    codeGenerator = codeGenerator,
+    client = okHttpClient,
+    exchangeResponseJsonAdapter = exchangeResponseJsonAdapter,
+    refreshResponseJsonAdapter = refreshResponseJsonAdapter,
+  )
 }

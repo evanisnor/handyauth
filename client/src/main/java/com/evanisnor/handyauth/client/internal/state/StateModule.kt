@@ -9,55 +9,52 @@ import com.squareup.moshi.Moshi
 
 internal interface StateModule {
 
-    fun instantFactory(): InstantFactory
+  fun instantFactory(): InstantFactory
 
-    fun moshi(): Moshi
+  fun moshi(): Moshi
 
-    fun memoryCache(
-        persistentCache: AuthStateCache
-    ): AuthStateCache
+  fun memoryCache(
+    persistentCache: AuthStateCache,
+  ): AuthStateCache
 
-    fun persistentCache(
-        context: Context,
-        config: HandyAuthConfig,
-        authStateJsonAdapter: AuthStateJsonAdapter
-    ): AuthStateCache
+  fun persistentCache(
+    context: Context,
+    config: HandyAuthConfig,
+    authStateJsonAdapter: AuthStateJsonAdapter,
+  ): AuthStateCache
 
-    fun authStateJsonAdapter(
-        moshi: Moshi
-    ): AuthStateJsonAdapter
-
+  fun authStateJsonAdapter(
+    moshi: Moshi,
+  ): AuthStateJsonAdapter
 }
 
 internal class DefaultStateModule : StateModule {
 
-    override fun instantFactory(): InstantFactory = DefaultInstantFactory()
+  override fun instantFactory(): InstantFactory = DefaultInstantFactory()
 
-    override fun moshi(): Moshi = Moshi.Builder()
-        .add(InstantJsonAdapter())
-        .build()
+  override fun moshi(): Moshi = Moshi.Builder()
+    .add(InstantJsonAdapter())
+    .build()
 
-    override fun memoryCache(
-        persistentCache: AuthStateCache
-    ): AuthStateCache = MemoryCache(
-        persistentCache = persistentCache
-    )
+  override fun memoryCache(
+    persistentCache: AuthStateCache,
+  ): AuthStateCache = MemoryCache(
+    persistentCache = persistentCache,
+  )
 
-    override fun persistentCache(
-        context: Context,
-        config: HandyAuthConfig,
-        authStateJsonAdapter: AuthStateJsonAdapter
-    ): AuthStateCache = SharedPrefsCache(
-        context = context,
-        instanceIdentifier = config.authorizationUrl.host ?: "unknown",
-        authStateJsonAdapter = authStateJsonAdapter
-    )
+  override fun persistentCache(
+    context: Context,
+    config: HandyAuthConfig,
+    authStateJsonAdapter: AuthStateJsonAdapter,
+  ): AuthStateCache = SharedPrefsCache(
+    context = context,
+    instanceIdentifier = config.authorizationUrl.host ?: "unknown",
+    authStateJsonAdapter = authStateJsonAdapter,
+  )
 
-    override fun authStateJsonAdapter(
-        moshi: Moshi
-    ): AuthStateJsonAdapter = AuthStateJsonAdapter(
-        moshi = moshi
-    )
-
-
+  override fun authStateJsonAdapter(
+    moshi: Moshi,
+  ): AuthStateJsonAdapter = AuthStateJsonAdapter(
+    moshi = moshi,
+  )
 }
