@@ -1,8 +1,3 @@
-<<<<<<< Updated upstream
-=======
-gimport org.jetbrains.kotlin.kapt3.base.Kapt.kapt
-
->>>>>>> Stashed changes
 plugins {
   id("com.android.application")
   id("kotlin-android")

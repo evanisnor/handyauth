@@ -3,7 +3,9 @@ package com.evanisnor.handyauth.client.internal.network
 import com.evanisnor.handyauth.client.HandyAuthConfig
 import com.evanisnor.handyauth.client.internal.model.AuthRequest
 import com.evanisnor.handyauth.client.internal.model.ExchangeResponse
+import com.evanisnor.handyauth.client.internal.model.ExchangeResponseJsonAdapter
 import com.evanisnor.handyauth.client.internal.model.RefreshResponse
+import com.evanisnor.handyauth.client.internal.model.RefreshResponseJsonAdapter
 import com.evanisnor.handyauth.client.internal.secure.CodeGenerator
 import com.squareup.moshi.JsonAdapter
 import okhttp3.FormBody
