@@ -38,8 +38,8 @@ android {
       Regex("(\\d+\\.\\d+)\\.\\d+").find(libs.versions.kotlin.get())!!.groupValues[1]
     jvmTarget = libs.versions.jvm.get()
     freeCompilerArgs = listOf(
-      "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-      "-Xopt-in=kotlinx.coroutines.ObsoleteCoroutinesApi",
+      "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+      "-opt-in=kotlinx.coroutines.ObsoleteCoroutinesApi",
     )
   }
 }
