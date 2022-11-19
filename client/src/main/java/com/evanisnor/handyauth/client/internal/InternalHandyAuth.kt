@@ -33,7 +33,7 @@ internal class InternalHandyAuth @DelicateCoroutinesApi constructor(
     val codeVerifier = tokenNetworkClient.createCodeVerifier()
     val authorizationRequest = tokenNetworkClient.buildAuthorizationRequest(codeVerifier)
 
-    var result: HandyAuth.Result? = null
+    var result: HandyAuth.Result?
 
     HandyAuthActivity.start(
       callingActivity = callingActivity,
