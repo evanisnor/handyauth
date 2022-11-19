@@ -75,14 +75,14 @@ dependencies {
   dokkaHtmlPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:1.6.0")
 
   // Test
-  testImplementation("androidx.test:core-ktx:1.4.0")
-  testImplementation("androidx.test.ext:junit-ktx:1.1.3")
+  testImplementation("androidx.test:core-ktx:1.5.0")
+  testImplementation("androidx.test.ext:junit-ktx:1.1.4")
   testImplementation("junit:junit:4.13.2")
   testImplementation("com.google.truth:truth:1.1.3")
 
-  androidTestImplementation("androidx.test:core-ktx:1.4.0")
-  androidTestImplementation("androidx.test.ext:junit-ktx:1.1.3")
-  androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+  androidTestImplementation("androidx.test:core-ktx:1.5.0")
+  androidTestImplementation("androidx.test.ext:junit-ktx:1.1.4")
+  androidTestImplementation("androidx.test.espresso:espresso-core:3.5.0")
   androidTestImplementation("com.google.truth:truth:1.1.3")
   androidTestImplementation("com.squareup.okhttp3:mockwebserver:5.0.0-alpha.6")
   androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
