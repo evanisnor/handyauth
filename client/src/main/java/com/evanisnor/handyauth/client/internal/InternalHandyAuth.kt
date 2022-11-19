@@ -72,8 +72,8 @@ internal class InternalHandyAuth @DelicateCoroutinesApi constructor(
     authResponse: AuthResponse,
     codeVerifier: String,
   ): HandyAuth.Result {
-    if (authResponse.error != null) {
-      return authResponse.error.toResultError()
+    return if (authResponse.error != null) {
+      authResponse.error.toResultError()
     } else if (
       authorizationValidator.isValid(authorizationRequest, authResponse) &&
       authResponse.authorizationCode != null
@@ -83,9 +83,9 @@ internal class InternalHandyAuth @DelicateCoroutinesApi constructor(
         codeVerifier = codeVerifier,
       )
       authStateRepository.save(exchangeResponse)
-      return HandyAuth.Result.Authorized
+      HandyAuth.Result.Authorized
     } else {
-      return HandyAuth.Result.Error.UnknownError
+      HandyAuth.Result.Error.UnknownError
     }
   }
 }
