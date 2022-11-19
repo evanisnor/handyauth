@@ -1,9 +1,9 @@
 plugins {
-  id("com.android.library")
-  id("kotlin-android")
-  id("com.google.devtools.ksp").version("1.7.20-1.0.8")
-  id("kotlin-parcelize")
-  id("org.jetbrains.dokka") version "1.6.0"
+  alias(libs.plugins.android.library)
+  alias(libs.plugins.google.ksp)
+  alias(libs.plugins.jetbrains.dokka)
+  alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.kotlin.parcelize)
   id("maven-publish")
 }
 
@@ -30,12 +30,13 @@ android {
   }
 
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.toVersion(libs.versions.jvm.get())
+    targetCompatibility = JavaVersion.toVersion(libs.versions.jvm.get())
   }
   kotlinOptions {
-    languageVersion = "1.7"
-    jvmTarget = "11"
+    languageVersion =
+      Regex("(\\d+\\.\\d+)\\.\\d+").find(libs.versions.kotlin.get())!!.groupValues[1]
+    jvmTarget = libs.versions.jvm.get()
     freeCompilerArgs = listOf(
       "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
       "-Xopt-in=kotlinx.coroutines.ObsoleteCoroutinesApi",
@@ -58,33 +59,27 @@ afterEvaluate {
 
 dependencies {
   // Runtime
-  implementation("androidx.appcompat:appcompat:1.5.1")
-  implementation("androidx.activity:activity-ktx:1.6.1")
-  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
-  implementation("androidx.browser:browser:1.4.0")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")
-  implementation("com.squareup.okio:okio:3.0.0")
-  implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.6")
-  implementation("com.squareup.moshi:moshi:1.14.0")
-  ksp("com.squareup.moshi:moshi-kotlin-codegen:1.14.0")
+  implementation(libs.bundles.client.androidx.framework)
+  implementation(libs.square.moshi)
+  ksp(libs.square.moshi.kotlin.codegen)
+  implementation(libs.square.okhttp)
+  implementation(libs.square.okio)
+  implementation(libs.jetbrains.coroutines.android)
 
   // Debug
-  debugImplementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.6")
+  debugImplementation(libs.square.okhttp.logging)
 
   // Documentation
-  dokkaHtmlPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:1.6.0")
+  dokkaHtmlPlugin(libs.jetbrains.dokka.kotlinasjava)
 
   // Test
-  testImplementation("androidx.test:core-ktx:1.5.0")
-  testImplementation("androidx.test.ext:junit-ktx:1.1.4")
-  testImplementation("junit:junit:4.13.2")
-  testImplementation("com.google.truth:truth:1.1.3")
+  testImplementation(libs.bundles.client.androidx.test)
+  testImplementation(libs.junit)
+  testImplementation(libs.google.test.truth)
 
-  androidTestImplementation("androidx.test:core-ktx:1.5.0")
-  androidTestImplementation("androidx.test.ext:junit-ktx:1.1.4")
-  androidTestImplementation("androidx.test.espresso:espresso-core:3.5.0")
-  androidTestImplementation("com.google.truth:truth:1.1.3")
-  androidTestImplementation("com.squareup.okhttp3:mockwebserver:5.0.0-alpha.6")
-  androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
-  kspAndroidTest("com.squareup.moshi:moshi-kotlin-codegen:1.14.0")
+  androidTestImplementation(libs.bundles.client.androidx.instrumentationtest)
+  androidTestImplementation(libs.google.test.truth)
+  androidTestImplementation(libs.square.test.mockwebserver)
+  androidTestImplementation(libs.jetbrains.test.coroutines)
+  kspAndroidTest(libs.square.moshi.kotlin.codegen)
 }

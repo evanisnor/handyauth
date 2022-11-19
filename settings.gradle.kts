@@ -4,6 +4,16 @@ dependencyResolutionManagement {
     google()
     mavenCentral()
   }
+  versionCatalogs {
+    create("libs")
+  }
+}
+
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+    google()
+  }
 }
 
 rootProject.name = "handyauth"

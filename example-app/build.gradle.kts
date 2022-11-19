@@ -1,8 +1,8 @@
 plugins {
-  id("com.android.application")
-  id("kotlin-android")
-  id("kotlin-kapt")
-  id("dagger.hilt.android.plugin")
+  alias(libs.plugins.android.application)
+  alias(libs.plugins.dagger.hilt)
+  alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.kotlin.kapt)
 }
 
 android {
@@ -30,24 +30,22 @@ android {
     }
   }
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.toVersion(libs.versions.jvm.get())
+    targetCompatibility = JavaVersion.toVersion(libs.versions.jvm.get())
   }
   kotlinOptions {
-    languageVersion = "1.7"
-    jvmTarget = "11"
+    languageVersion =
+      Regex("(\\d+\\.\\d+)\\.\\d+").find(libs.versions.kotlin.get())!!.groupValues[1]
+    jvmTarget = libs.versions.jvm.get()
   }
 }
 
 dependencies {
   implementation(project(":client"))
 
-  implementation("androidx.core:core-ktx:1.9.0")
-  implementation("androidx.appcompat:appcompat:1.5.1")
-  implementation("androidx.fragment:fragment-ktx:1.5.4")
-  implementation("com.google.android.material:material:1.7.0")
-  implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+  implementation(libs.bundles.example.androidx.framework)
+  implementation(libs.google.material)
 
-  implementation("com.google.dagger:hilt-android:2.44")
-  kapt("com.google.dagger:hilt-android-compiler:2.44")
+  implementation(libs.google.dagger.hilt.android)
+  kapt(libs.google.dagger.hilt.android.compiler)
 }
