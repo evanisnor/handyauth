@@ -77,10 +77,13 @@ dependencies {
 
   // Test
   testImplementation(libs.bundles.client.androidx.test)
+  testImplementation(libs.jetbrains.test.coroutines)
   testImplementation(libs.junit)
+  testImplementation(libs.robolectric)
   testImplementation(libs.google.test.truth)
+  kspTest(libs.square.moshi.kotlin.codegen)
 
-  androidTestImplementation(libs.bundles.client.androidx.instrumentationtest)
+  androidTestImplementation(libs.bundles.client.androidx.test)
   androidTestImplementation(libs.google.test.truth)
   androidTestImplementation(libs.square.test.mockwebserver)
   androidTestImplementation(libs.jetbrains.test.coroutines)
