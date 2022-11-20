@@ -12,6 +12,7 @@ import com.evanisnor.handyauth.client.databinding.HandyAuthActivityBinding
 import com.evanisnor.handyauth.client.internal.AuthResponseContract
 import com.evanisnor.handyauth.client.internal.browser.WebAuthorizationHandler
 import com.evanisnor.handyauth.client.internal.ext.getParcelableExtraCompat
+import com.evanisnor.handyauth.client.internal.ext.queryIntentActivitiesCompat
 import com.evanisnor.handyauth.client.internal.model.AuthRequest
 import com.evanisnor.handyauth.client.internal.model.AuthResponse
 
@@ -121,7 +122,7 @@ class HandyAuthActivity : AppCompatActivity() {
       data = Uri.fromParts("http", "", null)
     }
 
-    return packageManager.queryIntentActivities(browsableIntent, 0).any { resolveInfo ->
+    return packageManager.queryIntentActivitiesCompat(browsableIntent, 0).any { resolveInfo ->
       val customTabsIntent = Intent().apply {
         action = CustomTabsService.ACTION_CUSTOM_TABS_CONNECTION
         `package` = resolveInfo.activityInfo.packageName
