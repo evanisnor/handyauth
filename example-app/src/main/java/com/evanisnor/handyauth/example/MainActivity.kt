@@ -3,6 +3,7 @@ package com.evanisnor.handyauth.example
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.evanisnor.handyauth.client.HandyAuth
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -18,14 +19,10 @@ class MainActivity : AppCompatActivity() {
     setContentView(R.layout.main_activity)
 
     if (!handyAuth.isAuthorized) {
-      handyAuth.authorize(this@MainActivity) {
-        when (it) {
-          is HandyAuth.Result.Authorized -> {
-            onAuthenticated()
-          }
-          is HandyAuth.Result.Error -> {
-            onError()
-          }
+      lifecycleScope.launchWhenCreated {
+        when (handyAuth.authorize(this@MainActivity)) {
+          is HandyAuth.Result.Authorized -> onAuthenticated()
+          is HandyAuth.Result.Error -> onError()
         }
       }
     } else {

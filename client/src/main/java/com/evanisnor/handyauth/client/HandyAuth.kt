@@ -37,10 +37,7 @@ interface HandyAuth {
    * that loads the server's authorization page, where the user can enter their credentials and
    * grant access to your app.
    */
-  fun authorize(
-    callingActivity: ComponentActivity,
-    resultCallback: (Result) -> Unit,
-  )
+  suspend fun authorize(callingActivity: ComponentActivity): Result
 
   /**
    * Get the access token in the form of a [HandyAccessToken]. As long as the user [isAuthorized]

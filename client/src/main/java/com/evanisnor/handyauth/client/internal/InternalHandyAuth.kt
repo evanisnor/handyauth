@@ -15,6 +15,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 internal class InternalHandyAuth @DelicateCoroutinesApi constructor(
   private val tokenNetworkClient: TokenNetworkClient,
@@ -26,31 +28,29 @@ internal class InternalHandyAuth @DelicateCoroutinesApi constructor(
   override val isAuthorized: Boolean
     get() = authStateRepository.isAuthorized
 
-  override fun authorize(
-    callingActivity: ComponentActivity,
-    resultCallback: (HandyAuth.Result) -> Unit,
-  ) {
-    val codeVerifier = tokenNetworkClient.createCodeVerifier()
-    val authorizationRequest = tokenNetworkClient.buildAuthorizationRequest(codeVerifier)
+  override suspend fun authorize(callingActivity: ComponentActivity): HandyAuth.Result =
+    suspendCoroutine { continuation ->
+      val codeVerifier = tokenNetworkClient.createCodeVerifier()
+      val authorizationRequest = tokenNetworkClient.buildAuthorizationRequest(codeVerifier)
 
-    var result: HandyAuth.Result?
+      var result: HandyAuth.Result?
 
-    HandyAuthActivity.start(
-      callingActivity = callingActivity,
-      authorizationRequest = authorizationRequest,
-    ) { authResponse ->
-      scope.launch {
-        authResponse?.let {
-          result = handleAuthorizationResponse(
-            authorizationRequest,
-            authResponse,
-            codeVerifier,
-          )
-          resultCallback(result ?: HandyAuth.Result.Error.UnknownError)
+      HandyAuthActivity.start(
+        callingActivity = callingActivity,
+        authorizationRequest = authorizationRequest,
+      ) { authResponse ->
+        scope.launch {
+          authResponse?.let {
+            result = handleAuthorizationResponse(
+              authorizationRequest,
+              authResponse,
+              codeVerifier,
+            )
+            continuation.resume(result ?: HandyAuth.Result.Error.UnknownError)
+          }
         }
       }
     }
-  }
 
   override suspend fun accessToken(): HandyAccessToken = withContext(scope.coroutineContext) {
     if (authStateRepository.isTokenExpired()) {

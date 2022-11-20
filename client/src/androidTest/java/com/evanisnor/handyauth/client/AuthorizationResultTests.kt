@@ -30,7 +30,7 @@ class AuthorizationResultTests {
       val handyAuth: HandyAuth = component.handyAuth
       fakeAuthServerRobot.setupSuccessfulAuthorization(server, config)
 
-      handyAuthRobot.performAuthorization(handyAuth, receivedResult::set)
+      handyAuthRobot.performAuthorization(handyAuth).let(receivedResult::set)
       server.waitForThisManyRequests(3)
 
       assertThat(receivedResult.get()).isEqualTo(HandyAuth.Result.Authorized)
@@ -56,7 +56,7 @@ class AuthorizationResultTests {
         expectedErrorUri = "https://fake.com/help",
       )
 
-      handyAuthRobot.performAuthorization(handyAuth, receivedResult::set)
+      handyAuthRobot.performAuthorization(handyAuth).let(receivedResult::set)
       server.waitForThisManyRequests(2)
 
       receivedResult.get().let { result ->
@@ -84,7 +84,7 @@ class AuthorizationResultTests {
         expectedErrorUri = "https://fake.com/help",
       )
 
-      handyAuthRobot.performAuthorization(handyAuth, receivedResult::set)
+      handyAuthRobot.performAuthorization(handyAuth).let(receivedResult::set)
       server.waitForThisManyRequests(2)
 
       receivedResult.get().let { result ->
@@ -112,7 +112,7 @@ class AuthorizationResultTests {
         expectedErrorUri = "https://fake.com/help",
       )
 
-      handyAuthRobot.performAuthorization(handyAuth, receivedResult::set)
+      handyAuthRobot.performAuthorization(handyAuth).let(receivedResult::set)
       server.waitForThisManyRequests(2)
 
       receivedResult.get().let { result ->
@@ -145,7 +145,7 @@ class AuthorizationResultTests {
         expectedErrorUri = "https://fake.com/help",
       )
 
-      handyAuthRobot.performAuthorization(handyAuth, receivedResult::set)
+      handyAuthRobot.performAuthorization(handyAuth).let(receivedResult::set)
       server.waitForThisManyRequests(2)
 
       receivedResult.get().let { result ->
@@ -178,7 +178,7 @@ class AuthorizationResultTests {
         expectedErrorUri = "https://fake.com/help",
       )
 
-      handyAuthRobot.performAuthorization(handyAuth, receivedResult::set)
+      handyAuthRobot.performAuthorization(handyAuth).let(receivedResult::set)
       server.waitForThisManyRequests(2)
 
       receivedResult.get().let { result ->

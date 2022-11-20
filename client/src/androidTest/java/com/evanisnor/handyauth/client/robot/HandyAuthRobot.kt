@@ -2,6 +2,7 @@ package com.evanisnor.handyauth.client.robot
 
 import android.app.Application
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.core.app.launchActivity
 import com.evanisnor.handyauth.client.HandyAuth
@@ -14,6 +15,8 @@ import com.evanisnor.handyauth.client.fakes.TestSecureModule
 import com.evanisnor.handyauth.client.fakes.TestStateModule
 import com.evanisnor.handyauth.client.fakeserver.FakeAuthorizationServer
 import com.evanisnor.handyauth.client.internal.HandyAuthComponent
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class HandyAuthRobot {
 
@@ -71,17 +74,18 @@ class HandyAuthRobot {
     return TestHandyAuthComponent(handyAuthComponent)
   }
 
-  internal fun performAuthorization(
-    handyAuth: HandyAuth,
-    resultCallback: (HandyAuth.Result) -> Unit = {},
-  ) {
-    launchActivity<TestLoginActivity>()
-      .moveToState(Lifecycle.State.CREATED)
-      .onActivity { activity ->
+  internal suspend fun performAuthorization(handyAuth: HandyAuth): HandyAuth.Result =
+    suspendCoroutine { continuation ->
+      launchActivity<TestLoginActivity>()
+        .moveToState(Lifecycle.State.CREATED)
+        .onActivity { activity ->
 
-        // Start the authorization flow - this will launch a browser
-        handyAuth.authorize(activity, resultCallback)
-      }
-      .moveToState(Lifecycle.State.RESUMED)
-  }
+          activity.lifecycleScope.launchWhenCreated {
+            // Start the authorization flow - this will launch a browser
+            val result = handyAuth.authorize(activity)
+            continuation.resume(result)
+          }
+        }
+        .moveToState(Lifecycle.State.RESUMED)
+    }
 }
