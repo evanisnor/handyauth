@@ -15,3 +15,14 @@ fun PackageManager.queryIntentActivitiesCompat(
     @Suppress("DEPRECATION")
     queryIntentActivities(intent, flags)
   }
+
+fun PackageManager.resolveServiceCompat(
+  intent: Intent,
+  flags: Int,
+): ResolveInfo? =
+  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    resolveService(intent, PackageManager.ResolveInfoFlags.of(flags.toLong()))
+  } else {
+    @Suppress("DEPRECATION")
+    resolveService(intent, flags)
+  }
