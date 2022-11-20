@@ -62,12 +62,6 @@ class FakeAuthorizationServer {
     )
   }
 
-  fun returnServerError(statusCode: Int) {
-    mockWebServer.enqueue(
-      MockResponse().setResponseCode(statusCode),
-    )
-  }
-
   fun acceptExchangeRequest(response: FakeExchangeResponse) {
     mockWebServer.enqueue(
       MockResponse().setBody(

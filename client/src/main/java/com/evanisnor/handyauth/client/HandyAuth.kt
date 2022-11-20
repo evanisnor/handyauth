@@ -82,11 +82,6 @@ interface HandyAuth {
       data class ServerError(val statusCode: Int) : Error
 
       /**
-       * A local error has occurred.
-       */
-      data class LocalError(val throwable: Throwable) : Error
-
-      /**
        * The server returned an OAuth 2 error. Standard OAuth 2 authorization error
        * parameters are provided.
        */
