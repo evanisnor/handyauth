@@ -11,6 +11,7 @@ import androidx.browser.customtabs.CustomTabsService
 import com.evanisnor.handyauth.client.databinding.HandyAuthActivityBinding
 import com.evanisnor.handyauth.client.internal.AuthResponseContract
 import com.evanisnor.handyauth.client.internal.browser.WebAuthorizationHandler
+import com.evanisnor.handyauth.client.internal.ext.getParcelableExtraCompat
 import com.evanisnor.handyauth.client.internal.model.AuthRequest
 import com.evanisnor.handyauth.client.internal.model.AuthResponse
 
@@ -57,7 +58,7 @@ class HandyAuthActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    authRequest = intent.getParcelableExtra(authorizationRequestExtra)
+    authRequest = intent.getParcelableExtraCompat(authorizationRequestExtra, AuthRequest::class)
     webAuthorizationHandler = WebAuthorizationHandler(
       redirectUrl = authRequest?.config?.redirectUrl ?: "",
       onAuthResponse = { response ->
