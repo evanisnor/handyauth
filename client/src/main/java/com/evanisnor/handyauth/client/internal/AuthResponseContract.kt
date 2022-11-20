@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
+import com.evanisnor.handyauth.client.internal.ext.getParcelableExtraCompat
 import com.evanisnor.handyauth.client.internal.model.AuthRequest
 import com.evanisnor.handyauth.client.internal.model.AuthResponse
 import com.evanisnor.handyauth.client.ui.HandyAuthActivity
@@ -15,7 +16,7 @@ class AuthResponseContract : ActivityResultContract<AuthRequest, AuthResponse?>(
     }
 
   override fun parseResult(resultCode: Int, intent: Intent?): AuthResponse? = when (resultCode) {
-    Activity.RESULT_OK -> intent?.getParcelableExtra(HandyAuthActivity.authorizationResponseExtra)
+    Activity.RESULT_OK -> intent?.getParcelableExtraCompat(HandyAuthActivity.authorizationResponseExtra, AuthResponse::class)
     Activity.RESULT_CANCELED -> null
     else -> null
   }
