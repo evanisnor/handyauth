@@ -3,7 +3,6 @@ package com.evanisnor.handyauth.example
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.evanisnor.handyauth.R
 import com.evanisnor.handyauth.client.HandyAuth
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

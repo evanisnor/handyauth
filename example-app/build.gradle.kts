@@ -6,6 +6,8 @@ plugins {
 }
 
 android {
+  namespace = "com.evanisnor.handyauth.example"
+
   compileSdk = 33
 
   defaultConfig {

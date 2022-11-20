@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.evanisnor.handyauth.client.HandyAuth
-import com.evanisnor.handyauth.databinding.AuthenticatedActivityBinding
+import com.evanisnor.handyauth.example.databinding.AuthenticatedActivityBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
