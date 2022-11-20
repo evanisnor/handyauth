@@ -8,6 +8,9 @@ plugins {
 }
 
 android {
+  namespace = "com.evanisnor.handyauth.client"
+  testNamespace = "com.evanisnor.handyauth.client"
+
   compileSdk = 33
 
   defaultConfig {
