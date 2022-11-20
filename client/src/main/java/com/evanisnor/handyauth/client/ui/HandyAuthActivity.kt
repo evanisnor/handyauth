@@ -13,6 +13,7 @@ import com.evanisnor.handyauth.client.internal.AuthResponseContract
 import com.evanisnor.handyauth.client.internal.browser.WebAuthorizationHandler
 import com.evanisnor.handyauth.client.internal.ext.getParcelableExtraCompat
 import com.evanisnor.handyauth.client.internal.ext.queryIntentActivitiesCompat
+import com.evanisnor.handyauth.client.internal.ext.resolveServiceCompat
 import com.evanisnor.handyauth.client.internal.model.AuthRequest
 import com.evanisnor.handyauth.client.internal.model.AuthResponse
 
@@ -127,7 +128,7 @@ class HandyAuthActivity : AppCompatActivity() {
         action = CustomTabsService.ACTION_CUSTOM_TABS_CONNECTION
         `package` = resolveInfo.activityInfo.packageName
       }
-      packageManager.resolveService(customTabsIntent, 0) != null
+      packageManager.resolveServiceCompat(customTabsIntent, 0) != null
     }
   }
 }
