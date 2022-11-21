@@ -50,8 +50,10 @@ class TokenNetworkClient(
       )
       .build()
 
-    return client.newCall(exchangeRequest).send()
-      .parseBody(adapter = exchangeResponseJsonAdapter)
+    return when (val response = client.newCall(exchangeRequest).send()) {
+      is CallResult.Response -> response.parseBody(adapter = exchangeResponseJsonAdapter)!!
+      is CallResult.Error -> throw response.error
+    }
   }
 
   suspend fun refresh(refreshToken: String): RefreshResponse {
@@ -66,22 +68,17 @@ class TokenNetworkClient(
       )
       .build()
 
-    return client.newCall(refreshRequest).send().parseBody(adapter = refreshResponseJsonAdapter)
+    return when (val response = client.newCall(refreshRequest).send()) {
+      is CallResult.Response -> response.parseBody(adapter = refreshResponseJsonAdapter)!!
+      is CallResult.Error -> throw response.error
+    }
   }
 
   /**
    * Parse the response body with the specified JsonAdapter
    */
-  private fun <T> CallResult.parseBody(adapter: JsonAdapter<T>) = when (this) {
-    is CallResult.Response -> {
-      runCatching {
-        response.body!!.let { body ->
-          adapter.fromJson(body.source())!!
-        }
-      }.getOrThrow()
+  private fun <T> CallResult.Response.parseBody(adapter: JsonAdapter<T>) =
+    response.body?.let { body ->
+      adapter.fromJson(body.source())
     }
-    is CallResult.Error -> {
-      throw Exception(error)
-    }
-  }
 }
