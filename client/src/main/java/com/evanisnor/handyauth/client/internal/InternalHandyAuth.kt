@@ -23,23 +23,23 @@ internal class InternalHandyAuth @DelicateCoroutinesApi constructor(
   override val isAuthorized: Boolean
     get() = authStateRepository.isAuthorized
 
-  override suspend fun prepareLoginUserFlow(callingFragment: Fragment) : HandyAuth.PendingAuthorization = InternalPendingAuthorization(
+  override suspend fun prepareAuthorization(callingFragment: Fragment) : HandyAuth.PendingAuthorization = InternalPendingAuthorization(
     tokenNetworkClient, authStateRepository, authorizationValidator, scope
   ).apply {
     prepare(callingFragment)
   }
 
-  override suspend fun prepareLoginUserFlow(callingActivity: ComponentActivity) : HandyAuth.PendingAuthorization = InternalPendingAuthorization(
+  override suspend fun prepareAuthorization(callingActivity: ComponentActivity) : HandyAuth.PendingAuthorization = InternalPendingAuthorization(
     tokenNetworkClient, authStateRepository, authorizationValidator, scope
   ).apply {
     prepare(callingActivity)
   }
 
   override suspend fun authorize(callingFragment: Fragment): HandyAuth.Result =
-    prepareLoginUserFlow(callingFragment).authorize()
+    prepareAuthorization(callingFragment).authorize()
 
   override suspend fun authorize(callingActivity: ComponentActivity): HandyAuth.Result =
-    prepareLoginUserFlow(callingActivity).authorize()
+    prepareAuthorization(callingActivity).authorize()
 
   override suspend fun accessToken(): HandyAccessToken = withContext(scope.coroutineContext) {
     if (authStateRepository.isTokenExpired()) {

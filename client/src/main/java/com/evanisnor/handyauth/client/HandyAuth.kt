@@ -37,16 +37,16 @@ interface HandyAuth {
    * Prepare for launching the login user flow by obtaining a [PendingAuthorization] object. You may
    * launch the user flow in a browser later by calling [PendingAuthorization.authorize]. This is
    * useful when you would like to start the authorization flow when the user clicks a button.
-   * NOTE: [prepareLoginUserFlow] can only be called during Fragment initialization (onCreate, onAttach)
+   * NOTE: [prepareAuthorization] can only be called during Fragment initialization (onCreate, onAttach)
    */
-  suspend fun prepareLoginUserFlow(callingFragment: Fragment) : PendingAuthorization
+  suspend fun prepareAuthorization(callingFragment: Fragment) : PendingAuthorization
 
   /**
    * Prepare for launching the login user flow by obtaining a [PendingAuthorization] object. You may
    * launch the user flow in a browser later by calling [PendingAuthorization.authorize].
-   * NOTE: [prepareLoginUserFlow] can only be called during Activity initialization (onCreate)
+   * NOTE: [prepareAuthorization] can only be called during Activity initialization (onCreate)
    */
-  suspend fun prepareLoginUserFlow(callingActivity: ComponentActivity) : PendingAuthorization
+  suspend fun prepareAuthorization(callingActivity: ComponentActivity) : PendingAuthorization
 
   /**
    * Begin the authorization flow and handle the [Result]. This will launch a browser
