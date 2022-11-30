@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.browser.customtabs.CustomTabsService
+import androidx.fragment.app.Fragment
 import com.evanisnor.handyauth.client.databinding.HandyAuthActivityBinding
 import com.evanisnor.handyauth.client.internal.AuthResponseContract
 import com.evanisnor.handyauth.client.internal.browser.WebAuthorizationHandler
@@ -28,6 +29,25 @@ class HandyAuthActivity : AppCompatActivity() {
 
     internal const val authorizationResponseExtra: String =
       "com.evanisnor.handyauth.client.ui.authorizationResponse"
+
+    fun registerForResult(
+      callingFragment: Fragment,
+      onAuthResponse: (AuthResponse?) -> Unit,
+    ) = callingFragment.registerForActivityResult(AuthResponseContract(), onAuthResponse)
+
+    fun registerForResult(
+      callingActivity: ComponentActivity,
+      onAuthResponse: (AuthResponse?) -> Unit,
+    ) = callingActivity.registerForActivityResult(AuthResponseContract(), onAuthResponse)
+
+    fun start(
+      callingFragment: Fragment,
+      authorizationRequest: AuthRequest,
+      onAuthResponse: (AuthResponse?) -> Unit,
+    ) {
+      callingFragment.registerForActivityResult(AuthResponseContract(), onAuthResponse)
+        .launch(authorizationRequest)
+    }
 
     fun start(
       callingActivity: ComponentActivity,

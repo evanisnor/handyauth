@@ -2,6 +2,7 @@ package com.evanisnor.handyauth.client
 
 import android.app.Application
 import androidx.activity.ComponentActivity
+import androidx.fragment.app.Fragment
 import com.evanisnor.handyauth.client.internal.HandyAuthComponent
 import kotlinx.coroutines.DelicateCoroutinesApi
 
@@ -33,9 +34,33 @@ interface HandyAuth {
   val isAuthorized: Boolean
 
   /**
+   * Prepare for launching the login user flow by obtaining a [PendingAuthorization] object. You may
+   * launch the user flow in a browser later by calling [PendingAuthorization.authorize]. This is
+   * useful when you would like to start the authorization flow when the user clicks a button.
+   * NOTE: [prepareLoginUserFlow] can only be called during Fragment initialization (onCreate, onAttach)
+   */
+  suspend fun prepareLoginUserFlow(callingFragment: Fragment) : PendingAuthorization
+
+  /**
+   * Prepare for launching the login user flow by obtaining a [PendingAuthorization] object. You may
+   * launch the user flow in a browser later by calling [PendingAuthorization.authorize].
+   * NOTE: [prepareLoginUserFlow] can only be called during Activity initialization (onCreate)
+   */
+  suspend fun prepareLoginUserFlow(callingActivity: ComponentActivity) : PendingAuthorization
+
+  /**
    * Begin the authorization flow and handle the [Result]. This will launch a browser
    * that loads the server's authorization page, where the user can enter their credentials and
    * grant access to your app.
+   * NOTE: [authorize] can only be called during the Fragment initialization (onCreate, onAttach)
+   */
+  suspend fun authorize(callingFragment: Fragment): Result
+
+  /**
+   * Begin the authorization flow and handle the [Result]. This will launch a browser
+   * that loads the server's authorization page, where the user can enter their credentials and
+   * grant access to your app.
+   * NOTE: [authorize] can only be called during Activity initialization (onCreate)
    */
   suspend fun authorize(callingActivity: ComponentActivity): Result
 
@@ -50,6 +75,24 @@ interface HandyAuth {
    * [isAuthorized] will return false.
    */
   suspend fun logout()
+
+  // region Pending Authorization
+
+  /**
+   * Represents a pending login flow. To proceed with authorization, call [PendingAuthorization.authorize].
+   */
+  interface PendingAuthorization {
+
+    /**
+     * Begin the authorization flow and handle the [Result]. This will launch a browser
+     * that loads the server's authorization page, where the user can enter their credentials and
+     * grant access to your app.
+     */
+    suspend fun authorize() : Result
+
+  }
+
+  // endregion
 
   // region Result Types
 

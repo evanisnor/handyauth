@@ -1,22 +1,17 @@
 package com.evanisnor.handyauth.client.internal
 
 import androidx.activity.ComponentActivity
+import androidx.fragment.app.Fragment
 import com.evanisnor.handyauth.client.HandyAccessToken
 import com.evanisnor.handyauth.client.HandyAuth
-import com.evanisnor.handyauth.client.internal.model.AuthRequest
-import com.evanisnor.handyauth.client.internal.model.AuthResponse
 import com.evanisnor.handyauth.client.internal.network.TokenNetworkClient
 import com.evanisnor.handyauth.client.internal.secure.AuthorizationValidator
 import com.evanisnor.handyauth.client.internal.state.AuthStateRepository
-import com.evanisnor.handyauth.client.ui.HandyAuthActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 internal class InternalHandyAuth @DelicateCoroutinesApi constructor(
   private val tokenNetworkClient: TokenNetworkClient,
@@ -28,29 +23,23 @@ internal class InternalHandyAuth @DelicateCoroutinesApi constructor(
   override val isAuthorized: Boolean
     get() = authStateRepository.isAuthorized
 
+  override suspend fun prepareLoginUserFlow(callingFragment: Fragment) : HandyAuth.PendingAuthorization = InternalPendingAuthorization(
+    tokenNetworkClient, authStateRepository, authorizationValidator, scope
+  ).apply {
+    prepare(callingFragment)
+  }
+
+  override suspend fun prepareLoginUserFlow(callingActivity: ComponentActivity) : HandyAuth.PendingAuthorization = InternalPendingAuthorization(
+    tokenNetworkClient, authStateRepository, authorizationValidator, scope
+  ).apply {
+    prepare(callingActivity)
+  }
+
+  override suspend fun authorize(callingFragment: Fragment): HandyAuth.Result =
+    prepareLoginUserFlow(callingFragment).authorize()
+
   override suspend fun authorize(callingActivity: ComponentActivity): HandyAuth.Result =
-    suspendCoroutine { continuation ->
-      val codeVerifier = tokenNetworkClient.createCodeVerifier()
-      val authorizationRequest = tokenNetworkClient.buildAuthorizationRequest(codeVerifier)
-
-      var result: HandyAuth.Result?
-
-      HandyAuthActivity.start(
-        callingActivity = callingActivity,
-        authorizationRequest = authorizationRequest,
-      ) { authResponse ->
-        scope.launch {
-          authResponse?.let {
-            result = handleAuthorizationResponse(
-              authorizationRequest,
-              authResponse,
-              codeVerifier,
-            )
-            continuation.resume(result ?: HandyAuth.Result.Error.UnknownError)
-          }
-        }
-      }
-    }
+    prepareLoginUserFlow(callingActivity).authorize()
 
   override suspend fun accessToken(): HandyAccessToken = withContext(scope.coroutineContext) {
     if (authStateRepository.isTokenExpired()) {
@@ -65,27 +54,5 @@ internal class InternalHandyAuth @DelicateCoroutinesApi constructor(
 
   override suspend fun logout(): Unit = withContext(scope.coroutineContext) {
     authStateRepository.clear()
-  }
-
-  private suspend fun handleAuthorizationResponse(
-    authorizationRequest: AuthRequest,
-    authResponse: AuthResponse,
-    codeVerifier: String,
-  ): HandyAuth.Result {
-    return if (authResponse.error != null) {
-      authResponse.error.toResultError()
-    } else if (
-      authorizationValidator.isValid(authorizationRequest, authResponse) &&
-      authResponse.authorizationCode != null
-    ) {
-      val exchangeResponse = tokenNetworkClient.exchangeCodeForTokens(
-        authorizationCode = authResponse.authorizationCode,
-        codeVerifier = codeVerifier,
-      )
-      authStateRepository.save(exchangeResponse)
-      HandyAuth.Result.Authorized
-    } else {
-      HandyAuth.Result.Error.UnknownError
-    }
   }
 }
