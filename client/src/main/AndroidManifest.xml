@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <application>
-        <activity
-            android:name=".ui.HandyAuthActivity"
-            android:exported="true"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.AppCompat.NoActionBar" />
+  <application>
+    <activity
+      android:name=".ui.HandyAuthActivity"
+      android:exported="true"
+      android:launchMode="singleTask"
+      android:theme="@style/Theme.AppCompat.NoActionBar" />
 
-        <activity
-            android:name=".ui.HandyAuthReceiverActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+    <activity
+      android:name=".ui.HandyAuthReceiverActivity"
+      android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
 
-                <!--suppress AndroidDomInspection -->
-                <data android:scheme="${redirectUriScheme}" />
-            </intent-filter>
-        </activity>
-    </application>
+        <!--suppress AndroidDomInspection -->
+        <data android:scheme="${redirectUriScheme}" />
+      </intent-filter>
+    </activity>
+  </application>
 
-    <queries>
-        <intent>
-            <action android:name="android.support.customtabs.action.CustomTabsService" />
-        </intent>
+  <queries>
+    <intent>
+      <action android:name="android.support.customtabs.action.CustomTabsService" />
+    </intent>
 
-        <intent>
-            <action android:name="android.intent.action.VIEW" />
-            <category android:name="android.intent.category.BROWSABLE" />
-            <data android:scheme="https" />
-        </intent>
-    </queries>
+    <intent>
+      <action android:name="android.intent.action.VIEW" />
+      <category android:name="android.intent.category.BROWSABLE" />
+      <data android:scheme="https" />
+    </intent>
+  </queries>
 
 </manifest>
