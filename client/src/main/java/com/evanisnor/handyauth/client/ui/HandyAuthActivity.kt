@@ -40,24 +40,6 @@ class HandyAuthActivity : AppCompatActivity() {
       onAuthResponse: (AuthResponse?) -> Unit,
     ) = callingActivity.registerForActivityResult(AuthResponseContract(), onAuthResponse)
 
-    fun start(
-      callingFragment: Fragment,
-      authorizationRequest: AuthRequest,
-      onAuthResponse: (AuthResponse?) -> Unit,
-    ) {
-      callingFragment.registerForActivityResult(AuthResponseContract(), onAuthResponse)
-        .launch(authorizationRequest)
-    }
-
-    fun start(
-      callingActivity: ComponentActivity,
-      authorizationRequest: AuthRequest,
-      onAuthResponse: (AuthResponse?) -> Unit,
-    ) {
-      callingActivity.registerForActivityResult(AuthResponseContract(), onAuthResponse)
-        .launch(authorizationRequest)
-    }
-
     fun startWithResponseUri(
       callingActivity: ComponentActivity,
       responseUri: Uri,
