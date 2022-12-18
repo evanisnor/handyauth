@@ -20,6 +20,8 @@ class TokenNetworkClient(
   private val refreshResponseJsonAdapter: RefreshResponseJsonAdapter,
 ) {
 
+  class TokenRefreshFailure(message: String, cause: Throwable?) : Error(message, cause)
+
   fun createCodeVerifier(): String {
     return codeGenerator.generate(128)
   }
@@ -70,7 +72,10 @@ class TokenNetworkClient(
 
     return when (val response = client.newCall(refreshRequest).send()) {
       is CallResult.Response -> response.parseBody(adapter = refreshResponseJsonAdapter)!!
-      is CallResult.Error -> throw response.error
+      is CallResult.Error -> throw TokenRefreshFailure(
+        response.body ?: "Token refresh failed without a response from the server",
+        response.error,
+      )
     }
   }
 
