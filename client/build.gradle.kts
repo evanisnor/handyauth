@@ -6,7 +6,6 @@ plugins {
   alias(libs.plugins.jetbrains.dokka)
   alias(libs.plugins.kotlin.android)
   alias(libs.plugins.kotlin.parcelize)
-  id("maven-publish")
 }
 
 android {
@@ -17,7 +16,6 @@ android {
 
   defaultConfig {
     minSdk = 26
-    targetSdk = 33
     consumerProguardFiles("consumer-rules.pro")
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
@@ -47,17 +45,11 @@ android {
       "-opt-in=kotlinx.coroutines.ObsoleteCoroutinesApi",
     )
   }
-}
 
-afterEvaluate {
   publishing {
-    publications {
-      create<MavenPublication>("release") {
-        from(components["release"])
-        group = "com.evanisnor.handyauth"
-        artifactId = "client"
-        version = project.version.toString()
-      }
+    singleVariant("release") {
+      withSourcesJar()
+      withJavadocJar()
     }
   }
 }
