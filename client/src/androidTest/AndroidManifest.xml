@@ -7,12 +7,12 @@
 
   <application android:networkSecurityConfig="@xml/network_security_config">
     <activity
-      android:name=".fakes.TestLoginActivity"
+      android:name="com.evanisnor.handyauth.client.fakes.TestLoginActivity"
       android:exported="false"
       android:theme="@style/Theme.AppCompat" />
 
     <activity
-      android:name=".ui.HandyAuthReceiverActivity"
+      android:name="com.evanisnor.handyauth.client.ui.HandyAuthReceiverActivity"
       android:exported="true"
       tools:node="replace">
       <intent-filter>

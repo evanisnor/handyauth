@@ -10,7 +10,6 @@ plugins {
 
 android {
   namespace = "com.evanisnor.handyauth.client"
-  testNamespace = "com.evanisnor.handyauth.client"
 
   compileSdk = 33
 
@@ -20,7 +19,7 @@ android {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
-  packagingOptions {
+  packaging {
     resources {
       excludes.add("META-INF/versions/**/*")
       pickFirsts.add("META-INF/AL2.0")
