@@ -19,8 +19,6 @@ android {
     versionCode = 1
     versionName = "1.0"
     manifestPlaceholders["redirectUriScheme"] = "com.evanisnor.freshwaves"
-
-    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
   buildFeatures {
